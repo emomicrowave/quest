@@ -1,6 +1,6 @@
 from pathlib import Path
 from context import kobold
-from kobold.task_db import TaskDB, PrettyTaskDB
+from kobold.taskdb import TaskDB, PrettyTaskDB
 
 empty_db_path = Path(__file__).parent.joinpath("dbs/empty_db.kob")
 simple_db_path = Path(__file__).parent.joinpath("dbs/simple_db.kob")

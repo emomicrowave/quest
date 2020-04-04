@@ -6,7 +6,7 @@ import os
 from typing import List
 from pathlib import Path
 from kobold.task import Task, PrettyTask
-from kobold.task_db import TaskDB, PrettyTaskDB
+from kobold.taskdb import TaskDB, PrettyTaskDB
 
 app = typer.Typer()
 tdb = None
