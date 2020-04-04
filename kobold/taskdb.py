@@ -16,7 +16,9 @@ class TaskDB:
                 self.add_task(entry)
 
     def save_tasks(self):
-        sorted_tasks = sorted(self.tasks.values(), key=lambda x: x.hash + 0x10000 if x.done else 0)
+        sorted_tasks = sorted(
+            self.tasks.values(), key=lambda x: x.hash + 0x10000 if x.done else 0
+        )
         all_tasks = "\n".join([str(t) for t in sorted_tasks])
         with open(self.filename, "w") as f:
             f.write(all_tasks)

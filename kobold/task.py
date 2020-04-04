@@ -6,6 +6,7 @@ from .tag import ctags, utags, ptags
 with_hash = parse.compile("{hash:4x} {text}").parse
 no_hash = parse.compile("{text}").parse
 
+
 class Task:
     def __init__(self, entry: str, salt=b""):
         if r := with_hash(entry) or no_hash(entry):
@@ -52,7 +53,9 @@ class PrettyTask(Task):
         if self.done:
             return typer.style(super().__repr__(), fg=typer.colors.BRIGHT_BLACK)
         else:
-            hash = typer.style(hex(self.hash).lstrip("0x").zfill(4), fg=typer.colors.RED)
+            hash = typer.style(
+                hex(self.hash).lstrip("0x").zfill(4), fg=typer.colors.RED
+            )
             return " ".join([hash] + [self.stylize(w) for w in self.entry.split()])
 
     def stylize(self, word: str):

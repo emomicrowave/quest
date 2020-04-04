@@ -1,6 +1,7 @@
 from context import kobold
 from kobold.tag import Tag, parse_tag
 
+
 class TestTagParse:
     def test_parse_utag(self):
         tag = parse_tag("due:tomorrow")

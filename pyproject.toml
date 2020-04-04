@@ -1,0 +1,20 @@
+[project]
+name = "kobold"
+version = "0.1.0"
+description = "Yet another CLI todo and project manager."
+authors = [
+    "Martin Thoma <h.filaretov@campus.tu-berlin.de>"
+]
+license = "MIT"
+readme = "readme.md"
+python = "^3.8"
+
+keywords = ["todo", "gtd", "productivity", "yakshaving"]
+
+[dev-dependencies]
+black = { version = "^18", python = "^3.8" }
+
+[tool.black]
+line-length = 88
+target_version = ['py38']
+

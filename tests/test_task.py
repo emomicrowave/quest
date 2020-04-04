@@ -47,7 +47,11 @@ class TestTaskTags:
     def test_multiple_project_tags(self):
         entry = "there +are interleaved +project +tags"
         t = Task(entry)
-        assert t.tags == [Tag("project", "are"), Tag("project", "project"), Tag("project", "tags")]
+        assert t.tags == [
+            Tag("project", "are"),
+            Tag("project", "project"),
+            Tag("project", "tags"),
+        ]
 
     def test_single_context_tag(self):
         entry = "0000 example @context_tag"
@@ -57,7 +61,11 @@ class TestTaskTags:
     def test_multiple_context_tags(self):
         entry = "there @are interleaved @context @tags"
         t = Task(entry)
-        assert t.tags == [Tag("context", "are"), Tag("context", "context"), Tag("context", "tags")]
+        assert t.tags == [
+            Tag("context", "are"),
+            Tag("context", "context"),
+            Tag("context", "tags"),
+        ]
 
 
 class TestTaskRepr:

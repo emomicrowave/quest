@@ -18,7 +18,9 @@ class Config:
 
 @app.command("rofi_select")
 def select_task_in_rofi():
-    rv = run(["rofi", "-dmenu", "-p", "kobold"], input=str(tdb).encode(), capture_output=True)
+    rv = run(
+        ["rofi", "-dmenu", "-p", "kobold"], input=str(tdb).encode(), capture_output=True
+    )
     print(rv)
     run(["pom", f"{rv.stdout.decode().strip()}"])
 
@@ -58,7 +60,7 @@ def callback(ctx: typer.Context):
     global tdb
     tdb = TaskDB(Config.db)
     if ctx.invoked_subcommand is None:
-        list_tasks(filters = None)
+        list_tasks(filters=None)
 
 
 if __name__ == "__main__":
