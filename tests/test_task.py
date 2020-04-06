@@ -28,8 +28,7 @@ class TestTaskCreate:
         assert t.entry == example_task["entry"] and t.hash == example_task["hash"]
 
     def test_create_hashed_task(self):
-        entry = "54a5 example"
-        t = Task(entry)
+        t = Task("example", hash=int("54a5", base=16))
         assert t.entry == example_task["entry"] and t.hash == example_task["hash"]
 
     def test_create_only_hashy(self):

@@ -1,6 +1,7 @@
 from .task import Task, PrettyTask
 from .tag import parse_tag
 from typing import List
+import parse
 
 
 class TaskDB:
@@ -13,20 +14,24 @@ class TaskDB:
     def load_tasks(self):
         with open(self.filename, "r") as f:
             for entry in f.readlines():
-                self.add_task(entry)
+                self.add_task(entry, with_hash=True)
 
     def save_tasks(self):
         sorted_tasks = sorted(
-            self.tasks.values(), key=lambda x: x.hash + 0x10000 if x.done else 0
+            self.tasks.values(), key=lambda x: x.hash + (0x10000 if x.done else 0)
         )
         all_tasks = "\n".join([str(t) for t in sorted_tasks])
         with open(self.filename, "w") as f:
             f.write(all_tasks)
 
-    def add_task(self, entry: str):
-        salt = 0
-        while (t := Task(entry, str(salt).encode())).hash in self.tasks.keys():
-            salt += 1
+    def add_task(self, entry: str, with_hash=False):
+        if with_hash:
+            r = parse.parse("{hash:4x} {entry}", entry)
+            t = Task(r['entry'], hash=r['hash'])
+        else:
+            salt = 0
+            while (t := Task(entry, str(salt).encode())).hash in self.tasks.keys():
+                salt += 1
         self.tasks[t.hash] = t
         return t
 

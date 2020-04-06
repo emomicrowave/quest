@@ -8,15 +8,13 @@ no_hash = parse.compile("{text}").parse
 
 
 class Task:
-    def __init__(self, entry: str, salt=b""):
-        if r := with_hash(entry) or no_hash(entry):
-            self.entry = r.named.get("text") or ""
-            self.hash = r.named.get("hash") or self.get_hash(salt)
-        else:
-            error_msg = "Invalid entry"
-            if len(entry) == 0:
-                error_msg += ". Your entry is empty! You can't complete a task if there's no task to complete"
+    def __init__(self, entry: str, salt=b"", hash=None):
+        if len(entry) == 0:
+            error_msg = "Your entry is empty! You can't complete a task if there's no task to complete"
             raise ValueError(error_msg)
+
+        self.entry = entry
+        self.hash = hash or self._hash(salt)
 
     @property
     def done(self):
@@ -34,7 +32,7 @@ class Task:
         tags += [r["tag"] for r in utags.findall(self.entry)]
         return tags
 
-    def get_hash(self, salt):
+    def _hash(self, salt):
         return int(
             hashlib.blake2b(self.entry.encode(), digest_size=2, salt=salt).hexdigest(),
             base=16,
@@ -52,7 +50,7 @@ class Task:
 
 class PrettyTask(Task):
     def __init__(self, t: Task):
-        super().__init__(str(t))
+        super().__init__(t.entry, hash=t.hash)
 
     def __repr__(self):
         if self.done:
