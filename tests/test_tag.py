@@ -9,16 +9,22 @@ class TestTagParse:
         assert str(tag) == "due:tomorrow"
 
     def test_parse_ctag(self):
-        tag = parse_tag("@home")
+        tag_text = "@home"
+        tag = parse_tag(tag_text)
         assert tag == Tag("context", "home")
+        assert str(tag) == tag_text
 
     def test_parse_ptag(self):
-        tag = parse_tag("+kobold")
+        tag_text = "+kobold"
+        tag = parse_tag(tag_text)
         assert tag == Tag("project", "kobold")
+        assert str(tag) == tag_text
 
     def test_parse_notag(self):
-        tag = parse_tag("not_a_tag")
+        tag_text = "not_a_tag"
+        tag = parse_tag(tag_text)
         assert tag == Tag("word", "not_a_tag")
+        assert str(tag) == tag_text
 
     def test_parse_with_default(self):
         tag = parse_tag("not_a_tag", "none")

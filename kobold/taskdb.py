@@ -1,8 +1,8 @@
-from .task import Task, PrettyTask
+from .task import Task
 from .tag import parse_tag
 from typing import List
 import parse
-
+import hashlib
 
 class TaskDB:
     def __init__(self, filename: str = None):
@@ -17,43 +17,38 @@ class TaskDB:
                 self.add_task(entry, with_hash=True)
 
     def save_tasks(self):
-        sorted_tasks = sorted(
-            self.tasks.values(), key=lambda x: x.hash + (0x10000 if x.done else 0)
-        )
-        all_tasks = "\n".join([str(t) for t in sorted_tasks])
         with open(self.filename, "w") as f:
-            f.write(all_tasks)
+            f.write(str(self))
 
     def add_task(self, entry: str, with_hash=False):
         if with_hash:
             r = parse.parse("{hash:4x} {entry}", entry)
-            t = Task(r['entry'], hash=r['hash'])
+            t = Task(r['entry'])
+            self.tasks[r['hash']] = t
         else:
             salt = 0
-            while (t := Task(entry, str(salt).encode())).hash in self.tasks.keys():
+            while (hash := self._hash(entry, salt)) in self.tasks.keys():
                 salt += 1
-        self.tasks[t.hash] = t
+            t = Task(entry)
+            self.tasks[hash] = t
         return t
+
+    def _hash(self, entry: str,  salt: int) -> int:
+        salt = str(salt).encode()
+        return int(
+            hashlib.blake2b(entry.encode(), digest_size=2, salt=salt).hexdigest(),
+            base=16,
+        )
+
 
     def remove_task(self, hash: int):
         self.tasks.pop(hash)
 
     def __repr__(self):
-        return "\n".join([str(t) for t in self.tasks.values()])
+        sorted_tasks = sorted(
+            self.tasks.items(), key=lambda x: x[0] + (0x10000 if x[1].done else 0)
+        )
+        format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
+        all_tasks = "\n".join([f"{format_hash(x[0])} {x[1]}" for x in sorted_tasks])
+        return all_tasks
 
-
-class PrettyTaskDB(TaskDB):
-    def __init__(self, tdb: TaskDB, hide_done: bool = True, filters: List[str] = None):
-        self.tasks = {hash: PrettyTask(task) for hash, task in tdb.tasks.items()}
-        self.hide_done = hide_done
-        self.filename = tdb.filename
-        self.filters = [parse_tag(t) for t in filters] if filters else []
-
-    def filter(self, tasks: List[Task]):
-        pred_done = lambda t: not (self.hide_done and t.done)
-        pred_tags = lambda t: all([tag in t.tags for tag in self.filters])
-        pred = lambda t: pred_done(t) and pred_tags(t)
-        return [t for t in tasks if pred(t)]
-
-    def __repr__(self):
-        return "\n".join([str(t) for t in self.filter(self.tasks.values())])

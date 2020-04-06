@@ -5,8 +5,9 @@ from subprocess import run
 import os
 from typing import List
 from pathlib import Path
-from kobold.task import Task, PrettyTask
-from kobold.taskdb import TaskDB, PrettyTaskDB
+from kobold.task import Task
+from kobold.taskdb import TaskDB
+from kobold.output import ListPrinter
 
 app = typer.Typer()
 tdb = None
@@ -45,14 +46,14 @@ def remove_task(hash: str):
 
 @app.command("ls")
 def list_tasks(filters: List[str] = typer.Argument(None), hide_done: bool = True):
-    typer.echo(PrettyTaskDB(tdb, hide_done=hide_done, filters=filters))
+    typer.echo(ListPrinter(tdb, hide_done=hide_done, filters=filters))
 
 
 @app.command("add")
 def add_task(entry: List[str]):
     t = tdb.add_task(" ".join(entry))
     tdb.save_tasks()
-    typer.echo(PrettyTask(t))
+    typer.echo(t)
 
 
 @app.callback(invoke_without_command=True)

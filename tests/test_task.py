@@ -1,20 +1,9 @@
 import pytest
-import hashlib
 from dataclasses import dataclass
 
 from context import kobold
-from kobold.task import Task, PrettyTask
+from kobold.task import Task
 from kobold.tag import Tag
-
-example_task_str = "54a5 example"
-example_task = {
-    "entry": "example",
-    "hash": int("54a5", base=16),
-}
-hash_hash = int("1936", base=16)
-stylized_output = (
-    "\x1b[31mbea1\x1b[0m example \x1b[32m+example\x1b[0m \x1b[34m@example\x1b[0m"
-)
 
 
 class TestTaskCreate:
@@ -25,16 +14,30 @@ class TestTaskCreate:
     def test_create_simple_task(self):
         entry = "example"
         t = Task(entry)
-        assert t.entry == example_task["entry"] and t.hash == example_task["hash"]
+        assert t.entry == entry
 
-    def test_create_hashed_task(self):
-        t = Task("example", hash=int("54a5", base=16))
-        assert t.entry == example_task["entry"] and t.hash == example_task["hash"]
-
-    def test_create_only_hashy(self):
-        entry = "54a5"
+    def test_create_done_task(self):
+        entry = "[X] example"
         t = Task(entry)
-        assert t.entry == entry and t.hash == hash_hash
+        assert t.done
+
+    def test_create_and_complete_task(self):
+        entry = "example"
+        t = Task(entry)
+        assert not t.done
+        t.complete()
+        assert t.done
+
+    def test_iterwords(self):
+        entry = "example +example @example ex:example"
+        expected = [
+                Tag("word", "example"),
+                Tag("project", "example"),
+                Tag("context", "example"),
+                Tag("ex", "example"),
+                ]
+        t = Task(entry)
+        assert list(t.iterwords()) == expected
 
 
 class TestTaskTags:
@@ -69,9 +72,7 @@ class TestTaskTags:
 
 class TestTaskRepr:
     def test_simple_task(self):
-        t = Task("example")
-        assert str(t) == example_task_str
+        entry = "example"
+        t = Task(entry)
+        assert str(t) == entry
 
-    def test_stylized_task(self):
-        t = PrettyTask(Task("example +example @example"))
-        assert str(t) == stylized_output
