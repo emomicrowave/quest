@@ -24,15 +24,16 @@ class TaskDB:
     def add_task(self, entry: str, with_hash=False):
         if with_hash:
             r = parse.parse("{hash:4x} {entry}", entry)
+            h = r["hash"]
             t = Task(r["entry"])
-            self.tasks[r["hash"]] = t
+            self.tasks[h] = t
         else:
             salt = 0
-            while (hash := self._hash(entry, salt)) in self.tasks.keys():
+            while (h := self._hash(entry, salt)) in self.tasks.keys():
                 salt += 1
             t = Task(entry)
-            self.tasks[hash] = t
-        return t
+            self.tasks[h] = t
+        return t, h
 
     def _hash(self, entry: str, salt: int) -> int:
         salt = str(salt).encode()
