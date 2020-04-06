@@ -1,5 +1,6 @@
 from .tag import ctags, utags, ptags, parse_tag, Tag
 
+
 class Task:
     def __init__(self, entry: str):
         if len(entry) == 0:
@@ -28,4 +29,3 @@ class Task:
 
     def __repr__(self):
         return self.entry
-

@@ -4,6 +4,7 @@ from typing import List
 import parse
 import hashlib
 
+
 class TaskDB:
     def __init__(self, filename: str = None):
         self.tasks = {}
@@ -23,8 +24,8 @@ class TaskDB:
     def add_task(self, entry: str, with_hash=False):
         if with_hash:
             r = parse.parse("{hash:4x} {entry}", entry)
-            t = Task(r['entry'])
-            self.tasks[r['hash']] = t
+            t = Task(r["entry"])
+            self.tasks[r["hash"]] = t
         else:
             salt = 0
             while (hash := self._hash(entry, salt)) in self.tasks.keys():
@@ -33,13 +34,12 @@ class TaskDB:
             self.tasks[hash] = t
         return t
 
-    def _hash(self, entry: str,  salt: int) -> int:
+    def _hash(self, entry: str, salt: int) -> int:
         salt = str(salt).encode()
         return int(
             hashlib.blake2b(entry.encode(), digest_size=2, salt=salt).hexdigest(),
             base=16,
         )
-
 
     def remove_task(self, hash: int):
         self.tasks.pop(hash)
@@ -51,4 +51,3 @@ class TaskDB:
         format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
         all_tasks = "\n".join([f"{format_hash(x[0])} {x[1]}" for x in sorted_tasks])
         return all_tasks
-

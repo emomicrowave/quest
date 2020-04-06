@@ -31,11 +31,11 @@ class TestTaskCreate:
     def test_iterwords(self):
         entry = "example +example @example ex:example"
         expected = [
-                Tag("word", "example"),
-                Tag("project", "example"),
-                Tag("context", "example"),
-                Tag("ex", "example"),
-                ]
+            Tag("word", "example"),
+            Tag("project", "example"),
+            Tag("context", "example"),
+            Tag("ex", "example"),
+        ]
         t = Task(entry)
         assert list(t.iterwords()) == expected
 
@@ -75,4 +75,3 @@ class TestTaskRepr:
         entry = "example"
         t = Task(entry)
         assert str(t) == entry
-

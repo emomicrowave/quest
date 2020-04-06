@@ -4,13 +4,12 @@ from .tag import parse_tag
 
 from typing import List
 
+
 class ListPrinter:
     def __init__(self, tdb: TaskDB, hide_done: bool = True, filters: List[str] = None):
-        self.tasks = tdb.tasks
-        self.hide_done = hide_done
-        self.filename = tdb.filename
-        self.filters = [parse_tag(t) for t in filters] if filters else []
         self.tdb = tdb
+        self.hide_done = hide_done
+        self.filters = [parse_tag(t) for t in filters] if filters else []
 
     def pred(self, task: Task):
         pred_done = lambda t: not (self.hide_done and t.done)
@@ -19,6 +18,7 @@ class ListPrinter:
         return pred(task)
 
     def __repr__(self):
-        filtered_tasks = {h: t for h, t in self.tasks.items() if self.pred(t)}
-        format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
-        return "\n".join([f"{format_hash(h)} {t}" for h, t in filtered_tasks.items()])
+        filtered_tasks = {h: t for h, t in self.tdb.tasks.items() if self.pred(t)}
+        filtered_tdb = TaskDB()
+        filtered_tdb.tasks = filtered_tasks
+        return str(filtered_tdb)

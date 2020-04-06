@@ -44,4 +44,3 @@ class TestTaskDBRemove:
     def test_remove_tasks(self):
         tdb = TaskDB(simple_db_path)
         tdb.remove_task(0xBEEF)
-
