@@ -1,7 +1,7 @@
 import typer
 import hashlib
 import parse
-from .tag import ctags, utags, ptags
+from .tag import ctags, utags, ptags, parse_tag, Tag
 
 with_hash = parse.compile("{hash:4x} {text}").parse
 no_hash = parse.compile("{text}").parse
@@ -39,6 +39,11 @@ class Task:
             hashlib.blake2b(self.entry.encode(), digest_size=2, salt=salt).hexdigest(),
             base=16,
         )
+
+    def iterwords(self):
+        iterator = (word for word in str(self).split())
+        yield Tag("hash", next(iterator))
+        yield from (parse_tag(word) for word in iterator)
 
     def __repr__(self):
         hash = hex(self.hash).lstrip("0x").zfill(4)

@@ -7,8 +7,15 @@ class Tag:
     type: str
     value: str
 
-    def __repr__(self):
-        return f"{self.type}:{self.value}"
+    def __str__(self):
+        if self.type == "context":
+            return f"@{self.value}"
+        elif self.type == "project":
+            return f"+{self.value}"
+        elif self.type == "word" or self.type == "hash":
+            return self.value
+        else:
+            return f"{self.type}:{self.value}"
 
 
 @parse.with_pattern(r"\S+:\S+")
@@ -39,4 +46,4 @@ def parse_tag(text: str, default=None):
     elif result := utags.parse(text):
         return result["tag"]
     else:
-        return default
+        return default or Tag("word", text)
