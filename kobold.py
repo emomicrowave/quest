@@ -50,7 +50,7 @@ def list_tasks(filters: List[str] = typer.Argument(None), hide_done: bool = True
     print(ListPrinter(tdb, hide_done=hide_done, filters=filters)())
 
 
-@app.command("add")
+@app.command("task")
 def add_task(entry: List[str]):
     t, h = tdb.add_task(" ".join(entry))
     tdb.save_tasks()
