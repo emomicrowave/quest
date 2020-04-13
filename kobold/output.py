@@ -18,17 +18,19 @@ class ListPrinter:
         return pred(task)
 
     def format_task(self, t: Task, h: int):
-        format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
-        tags = [Text(format_hash(h), style="red")]
+        h = hex(h).lstrip('0x').zfill(4)
+        if t.done:
+            return Text(f"{h} {t.entry}", style="bright_black")
+        tags = [Text(h, style="green")]
         for tag in t.iterwords():
             if tag.type == "project":
-                style = "green"
+                style = "magenta"
             elif tag.type == "context":
-                style = "blue"
+                style = "cyan"
             elif tag.type == "word":
                 style = None
             else:
-                style = "yellow"
+                style = "blue"
             tags.append(Text(str(tag), style=style))
         return Text(" ").join(tags)
 
