@@ -3,6 +3,7 @@ import typer
 import hashlib
 from subprocess import run
 import os
+import git
 from typing import List
 from pathlib import Path
 from rich import print
@@ -61,7 +62,8 @@ def add_task(entry: List[str]):
 @app.callback(invoke_without_command=True)
 def callback(ctx: typer.Context):
     global tdb
-    tdb = TaskDB(Config.db)
+    working_dir = git.Repo(search_parent_directories=True).working_dir
+    tdb = TaskDB(Path(working_dir).joinpath(".kobold"))
     if ctx.invoked_subcommand is None:
         list_tasks(filters=None)
 

@@ -13,9 +13,12 @@ class TaskDB:
             self.load_tasks()
 
     def load_tasks(self):
-        with open(self.filename, "r") as f:
-            for entry in f.readlines():
-                self.add_task(entry, with_hash=True)
+        try:
+            with open(self.filename, "r") as f:
+                for entry in f.readlines():
+                    self.add_task(entry, with_hash=True)
+        except FileNotFoundError:
+            print("No kobold file!")
 
     def save_tasks(self):
         with open(self.filename, "w") as f:
