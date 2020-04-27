@@ -22,22 +22,20 @@ class ListPrinter:
         if t.done:
             return Text(f"{h} {t.entry}", style="bright_black")
         tags = [Text(h, style="green")]
+        colors = {
+                "project": "magenta",
+                "context": "cyan",
+                "word": None,
+                }
+        default_color = "blue"
         for tag in t.iterwords():
-            if tag.type == "project":
-                style = "magenta"
-            elif tag.type == "context":
-                style = "cyan"
-            elif tag.type == "word":
-                style = None
-            else:
-                style = "blue"
+            style = colors.get(tag.type, default_color)
             tags.append(Text(str(tag), style=style))
         return Text(" ").join(tags)
 
     def filter_tasks(self) -> List[Task]:
         filtered_tasks = {h: t for h, t in self.tdb.tasks.items() if self.pred(t)}
         return filtered_tasks
-
 
     def __call__(self):
         return Text("\n").join([self.format_task(t, h) for h, t in self.filter_tasks().items()])
