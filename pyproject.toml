@@ -3,7 +3,7 @@ name = "kobold"
 version = "0.1.0"
 description = "Yet another CLI todo and project manager."
 authors = [
-    "Martin Thoma <h.filaretov@campus.tu-berlin.de>"
+    "Hristo Filaretov <h.filaretov@campus.tu-berlin.de>"
 ]
 license = "MIT"
 readme = "readme.md"
