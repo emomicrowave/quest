@@ -1,4 +1,4 @@
-#!/home/hgf/.miniconda/envs/tamagotchi/bin/python
+#!/home/hgf/.miniconda/envs/cli/bin/python
 import typer
 import hashlib
 from subprocess import run
