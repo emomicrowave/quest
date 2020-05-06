@@ -14,10 +14,10 @@ class ListPrinter:
     def format_task(self, t: Task, h: str) -> Text:
         if t.done:
             return Text(f"{h} {t}", style="bright_black")
-        task = Text(f"{h} {t}")
-        task.highlight_regex(r"^[0-9a-f]{4} \w+:", "blue")
-        task.highlight_regex(r"^[0-9a-f]{4}", "green")
-        return task
+        hash = Text(h, style="green")
+        project = Text(f"{t.project}:", style="blue")
+        name = Text(t.name)
+        return Text(" ").join([hash, project, name])
 
     def filter_tasks(self) -> List[Task]:
         filtered = copy(self.tdb.tasks)
@@ -25,6 +25,7 @@ class ListPrinter:
             filtered = {k: task for k, task in filtered.items() if not task.done}
         if self.project:
             filtered = {k: task for k, task in filtered.items() if self.project == task.project}
+        filtered = {k: v for k, v in sorted(filtered.items(), key=lambda x: x[1].project)}
         return filtered
 
     def __call__(self) -> Text:
