@@ -1,4 +1,4 @@
-from .tag import ctags, utags, ptags, parse_tag, Tag
+from parse import findall
 
 
 class Task:
@@ -9,23 +9,18 @@ class Task:
         self.entry = entry
 
     @property
-    def done(self):
+    def done(self) -> bool:
         return self.entry.startswith("[X]")
 
-    def complete(self):
+    @property
+    def project(self) -> str:
+        result = list(findall(r" +{project:w}", self.entry))
+        if len(result) != 0:
+            return result[0]['project']
+
+    def complete(self) -> None:
         if not self.done:
             self.entry = f"[X] {self.entry}"
-
-    @property
-    def tags(self):
-        tags = []
-        tags += [r["tag"] for r in ptags.findall(self.entry)]
-        tags += [r["tag"] for r in ctags.findall(self.entry)]
-        tags += [r["tag"] for r in utags.findall(self.entry)]
-        return tags
-
-    def iterwords(self):
-        yield from (parse_tag(word) for word in self.entry.split())
 
     def __repr__(self):
         return self.entry

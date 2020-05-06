@@ -1,9 +1,11 @@
-#!/home/hgf/.miniconda/envs/cli/bin/python
+#!/home/hgf/.miniconda/envs/ork/bin/python
 import typer
 import hashlib
 from subprocess import run
 import os
+import sys
 import git
+import yaml
 from typing import List
 from pathlib import Path
 from rich import print
@@ -12,58 +14,48 @@ from kobold.taskdb import TaskDB
 from kobold.output import ListPrinter
 
 app = typer.Typer()
-tdb = None
-
-
-class Config:
-    db = Path.home().joinpath(".kobold")
-
-
-@app.command("rofi_select")
-def select_task_in_rofi():
-    rv = run(
-        ["rofi", "-dmenu", "-p", "kobold"], input=str(tdb).encode(), capture_output=True
-    )
-    print(rv)
-    run(["pom", f"{rv.stdout.decode().strip()}"])
+config = {"path": Path.home().joinpath("cloud/kobold.yaml"), "tdb": None}
 
 
 @app.command("done")
 def mark_task_done(hash: str):
-    hash = int(hash, base=16)
-    tdb.tasks[hash].complete()
-    tdb.save_tasks()
+    config["tdb"].tasks[hash].complete()
+    with open(config["path"], "w") as f:
+        f.writelines(config["tdb"].dump())
 
 
 @app.command("edit")
 def edit_tasks_in_editor():
-    run([os.getenv("EDITOR", "vi"), Config.db])
+    run([os.getenv("EDITOR", "vi"), config["path"]])
 
 
 @app.command("rm")
 def remove_task(hash: str):
-    tdb.remove_task(int(hash, base=16))
-    tdb.save_tasks()
+    config["tdb"].tasks.pop(hash)
+    with open(config["path"], "w") as f:
+        f.writelines(config["tdb"].dump())
 
 
 @app.command("ls")
 def list_tasks(filters: List[str] = typer.Argument(None), hide_done: bool = True):
-    print(ListPrinter(tdb, hide_done=hide_done, filters=filters)())
+    print(ListPrinter(config["tdb"], hide_done=hide_done, filters=filters)())
 
 
-@app.command("task")
+@app.command("new")
 def add_task(entry: List[str]):
-    t, h = tdb.add_task(" ".join(entry))
-    tdb.save_tasks()
-    lp = ListPrinter(None)
-    print(lp.format_task(t, h))
+    config["tdb"].add_task(" ".join(entry))
+    with open(config["path"], "w") as f:
+        f.writelines(config["tdb"].dump())
 
 
 @app.callback(invoke_without_command=True)
 def callback(ctx: typer.Context):
-    global tdb
-    working_dir = git.Repo(search_parent_directories=True).working_dir
-    tdb = TaskDB(Path(working_dir).joinpath(".kobold"))
+    global config
+
+    with open(config["path"]) as f:
+        tasks = yaml.load(f, Loader=yaml.Loader)
+    config["tdb"] = TaskDB(tasks)
+
     if ctx.invoked_subcommand is None:
         list_tasks(filters=None)
 

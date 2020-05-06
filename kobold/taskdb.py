@@ -1,57 +1,40 @@
 from .task import Task
-from .tag import parse_tag
-from typing import List
 import parse
 import hashlib
+import yaml
+from typing import Dict
 
 
 class TaskDB:
-    def __init__(self, filename: str = None):
-        self.tasks = {}
-        if filename:
-            self.filename = filename
-            self.load_tasks()
+    def __init__(self, tasks: Dict[str, str]):
+        self.tasks = {k: Task(v) for k, v in tasks.items()}
 
-    def load_tasks(self):
-        try:
-            with open(self.filename, "r") as f:
-                for entry in f.readlines():
-                    self.add_task(entry, with_hash=True)
-        except FileNotFoundError:
-            print("No kobold file!")
-
-    def save_tasks(self):
-        with open(self.filename, "w") as f:
-            f.write(str(self))
-
-    def add_task(self, entry: str, with_hash=False):
-        if with_hash:
-            r = parse.parse("{hash:4x} {entry}", entry)
-            h = r["hash"]
-            t = Task(r["entry"])
-            self.tasks[h] = t
-        else:
-            salt = 0
-            while (h := self._hash(entry, salt)) in self.tasks.keys():
-                salt += 1
-            t = Task(entry)
-            self.tasks[h] = t
+    def add_task(self, entry: str):
+        salt = 0
+        while (h := self._hash(entry, salt)) in self.tasks.keys():
+            salt += 1
+        t = Task(entry)
+        self.tasks[h] = t
         return t, h
 
-    def _hash(self, entry: str, salt: int) -> int:
+    def _hash(self, entry: str, salt: int) -> str:
         salt = str(salt).encode()
-        return int(
+        hash = int(
             hashlib.blake2b(entry.encode(), digest_size=2, salt=salt).hexdigest(),
             base=16,
         )
+        format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
+        return format_hash(hash)
 
-    def remove_task(self, hash: int):
+    def remove_task(self, hash: str):
         self.tasks.pop(hash)
+
+    def dump(self):
+        return yaml.dump({k: v.entry for k, v in self.tasks.items()})
 
     def __repr__(self):
         sorted_tasks = sorted(
-            self.tasks.items(), key=lambda x: x[0] + (0x10000 if x[1].done else 0)
+            self.tasks.items(), key=lambda task: task[0] + (0x10000 if task[1].done else 0)
         )
-        format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
-        all_tasks = "\n".join([f"{format_hash(x[0])} {x[1]}" for x in sorted_tasks])
+        all_tasks = "\n".join([f"{x[0]} {x[1]}" for x in sorted_tasks])
         return all_tasks
