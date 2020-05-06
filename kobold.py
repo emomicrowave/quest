@@ -1,10 +1,7 @@
 #!/home/hgf/.miniconda/envs/ork/bin/python
-import hashlib
-from subprocess import run
-import os
-import sys
-import git
 import yaml
+from subprocess import run
+from os import getenv
 from typing import List
 from pathlib import Path
 from rich import print
@@ -26,7 +23,7 @@ def mark_task_done(hash: str):
 
 @app.command("edit")
 def edit_tasks_in_editor():
-    run([os.getenv("EDITOR", "vi"), config["path"]])
+    run([getenv("EDITOR", "vi"), config["path"]])
 
 
 @app.command("rm")
@@ -38,15 +35,19 @@ def remove_task(hash: str):
 
 @app.command("ls")
 def list_tasks(
-    hide_done: bool = Option(True),
-    project: str = Option(None, "--project", "-p"),
+    hide_done: bool = Option(True), project: str = Option(None, "--project", "-p")
 ):
     print(ListPrinter(config["tdb"], hide_done=hide_done, project=project)())
 
 
 @app.command("new")
-def add_task(entry: List[str]):
-    config["tdb"].add_task(" ".join(entry))
+def add_task(
+    entry: List[str],
+    project: str = Option("void", "--project", "-p"),
+    due: str = Option(None, "--due", "-d"),
+):
+    task = Task(name=" ".join(entry), project=project, due=due)
+    config["tdb"].add_task(task)
     with open(config["path"], "w") as f:
         f.writelines(config["tdb"].dump())
 
@@ -60,7 +61,7 @@ def callback(ctx: Context):
     config["tdb"] = TaskDB(tasks)
 
     if ctx.invoked_subcommand is None:
-        list_tasks(filters=None)
+        list_tasks(True, None)
 
 
 if __name__ == "__main__":

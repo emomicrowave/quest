@@ -7,15 +7,14 @@ from typing import Dict
 
 class TaskDB:
     def __init__(self, tasks: Dict[str, str]):
-        self.tasks = {k: Task(v) for k, v in tasks.items()}
+        self.tasks = {k: Task(**v) for k, v in tasks.items()}
 
-    def add_task(self, entry: str):
+    def add_task(self, task: Task):
         salt = 0
-        while (h := self._hash(entry, salt)) in self.tasks.keys():
+        while (hash := self._hash(str(task), salt)) in self.tasks.keys():
             salt += 1
-        t = Task(entry)
-        self.tasks[h] = t
-        return t, h
+        self.tasks[hash] = task
+        return task, hash
 
     def _hash(self, entry: str, salt: int) -> str:
         salt = str(salt).encode()
@@ -30,11 +29,8 @@ class TaskDB:
         self.tasks.pop(hash)
 
     def dump(self):
-        return yaml.dump({k: v.entry for k, v in self.tasks.items()})
+        return yaml.dump({k: v.dict for k, v in self.tasks.items()})
 
     def __repr__(self):
-        sorted_tasks = sorted(
-            self.tasks.items(), key=lambda task: task[0] + (0x10000 if task[1].done else 0)
-        )
-        all_tasks = "\n".join([f"{x[0]} {x[1]}" for x in sorted_tasks])
+        all_tasks = "\n".join([f"{h}: {t}" for h, t in self.tasks.items()])
         return all_tasks

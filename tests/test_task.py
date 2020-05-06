@@ -10,26 +10,21 @@ class TestTaskCreate:
         with pytest.raises(ValueError):
             t = Task("")
 
-    def test_create_simple_task(self):
-        entry = "example"
-        t = Task(entry)
-        assert t.entry == entry
-
-    def test_create_done_task(self):
-        entry = "[X] example"
-        t = Task(entry)
-        assert t.done
-
-    def test_create_and_complete_task(self):
-        entry = "example"
-        t = Task(entry)
+    def test_not_done(self):
+        t = Task(name="test", project="test", state="todo", created="now", due="tomorrow")
         assert not t.done
+
+    def test_complete(self):
+        t = Task(name="test", project="test", state="todo", created="now", due="tomorrow")
         t.complete()
         assert t.done
 
+    def test_project(self):
+        t = Task(name="test", project="test_project", state="todo", created="now", due="tomorrow")
+        assert t.project == "test_project"
 
-class TestTaskRepr:
-    def test_simple_task(self):
-        entry = "example"
-        t = Task(entry)
-        assert str(t) == entry
+    def test_repr_defined(self):
+        t = Task(name="test")
+        assert type(t.__repr__()) == str
+
+

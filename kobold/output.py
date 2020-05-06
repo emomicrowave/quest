@@ -15,16 +15,16 @@ class ListPrinter:
         if t.done:
             return Text(f"{h} {t}", style="bright_black")
         task = Text(f"{h} {t}")
+        task.highlight_regex(r"^[0-9a-f]{4} \w+:", "blue")
         task.highlight_regex(r"^[0-9a-f]{4}", "green")
-        task.highlight_regex(r"\+\w+", "blue")
         return task
 
     def filter_tasks(self) -> List[Task]:
         filtered = copy(self.tdb.tasks)
         if self.hide_done:
-            filtered = {k: v for k, v in filtered.items() if not v.done}
+            filtered = {k: task for k, task in filtered.items() if not task.done}
         if self.project:
-            filtered = {k: v for k, v in filtered.items() if self.project == v.project}
+            filtered = {k: task for k, task in filtered.items() if self.project == task.project}
         return filtered
 
     def __call__(self) -> Text:
