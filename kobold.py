@@ -1,5 +1,4 @@
 #!/home/hgf/.miniconda/envs/ork/bin/python
-import typer
 import hashlib
 from subprocess import run
 import os
@@ -9,11 +8,12 @@ import yaml
 from typing import List
 from pathlib import Path
 from rich import print
+from typer import Typer, Option, Argument, Context
 from kobold.task import Task
 from kobold.taskdb import TaskDB
 from kobold.output import ListPrinter
 
-app = typer.Typer()
+app = Typer()
 config = {"path": Path.home().joinpath("cloud/kobold.yaml"), "tdb": None}
 
 
@@ -37,8 +37,11 @@ def remove_task(hash: str):
 
 
 @app.command("ls")
-def list_tasks(filters: List[str] = typer.Argument(None), hide_done: bool = True):
-    print(ListPrinter(config["tdb"], hide_done=hide_done, filters=filters)())
+def list_tasks(
+    hide_done: bool = Option(True),
+    project: str = Option(None, "--project", "-p"),
+):
+    print(ListPrinter(config["tdb"], hide_done=hide_done, project=project)())
 
 
 @app.command("new")
@@ -49,7 +52,7 @@ def add_task(entry: List[str]):
 
 
 @app.callback(invoke_without_command=True)
-def callback(ctx: typer.Context):
+def callback(ctx: Context):
     global config
 
     with open(config["path"]) as f:
