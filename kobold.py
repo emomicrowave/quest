@@ -52,6 +52,13 @@ def add_task(
         f.writelines(config["tdb"].dump())
 
 
+@app.command("track")
+def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
+    entry = f"{config['tdb'].tasks[hash].name} {comment}".strip()
+    with open(Path.home().joinpath(".current_task"), "w") as f:
+        f.write(entry)
+
+
 @app.callback(invoke_without_command=True)
 def callback(ctx: Context):
     global config
