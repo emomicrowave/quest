@@ -9,12 +9,17 @@ license = "MIT"
 readme = "readme.md"
 python = "^3.8"
 
-keywords = ["todo", "gtd", "productivity", "yakshaving"]
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
 
-[dev-dependencies]
-black = { version = "^18", python = "^3.8" }
+[tool.flit.metadata]
+module = "kobold"
+author = "Hristo Filaretov"
+author-email = "h.filaretov@campus.tu-berlin.de"
+classifiers = ["License :: OSI Approved :: MIT License"]
 
 [tool.black]
-line-length = 88
+line-length = 90
 target_version = ['py38']
 
