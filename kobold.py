@@ -10,7 +10,7 @@ from kobold.task import Task
 from kobold.taskdb import TaskDB
 from kobold.output import ListPrinter
 
-app = Typer()
+app = Typer(add_completion=False)
 config = {"path": Path.home().joinpath("cloud/kobold.yaml"), "tdb": None}
 
 
