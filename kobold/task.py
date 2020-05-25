@@ -29,6 +29,7 @@ class Task:
 
     def __repr__(self):
         return f"Task: {self.name=} {self.project=} {self.state=}"
-    
+
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
