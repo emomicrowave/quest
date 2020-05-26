@@ -9,7 +9,7 @@ from rich.text import Text
 from typer import Typer, Option, Argument, Context
 from kobold.task import Task
 from kobold.taskdb import YamlDB
-from kobold.output import ListPrinter, format_task
+from kobold.output import ListPrinter, format_task, format
 
 kobold = Typer(add_completion=False)
 debug = Typer(add_completion=False)
@@ -66,7 +66,7 @@ def list_tasks(
     hide_done: bool = Option(True), project: str = Option(None, "--project", "-p")
 ):
     with YamlDB(config["path"], "r") as tdb:
-        print(ListPrinter(tdb, hide_done=hide_done, project=project)())
+        print(format(tdb.filter(lambda t: not t.done)))
 
 
 @kobold.command("new")

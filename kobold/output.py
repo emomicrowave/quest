@@ -4,6 +4,7 @@ from .task import Task
 from typing import List
 from copy import copy
 from rich.text import Text
+from functools import singledispatch
 
 
 class ListPrinter:
@@ -29,6 +30,19 @@ class ListPrinter:
 
     def __repr__(self):
         return str(self.tdb)
+
+@singledispatch
+def format(arg, *args) -> Text:
+    return Text("Something went wrong!", style="red")
+
+@format.register
+def _(task: Task, hash: str) -> Text:
+    return format_task(task, hash)
+
+@format.register
+def _(tdb: TaskDB) -> Text:
+    tasks = {h: t for h, t in sorted(tdb.tasks.items(), key=lambda x: x[1].project)}
+    return Text("\n").join([format(t, h) for h, t in tasks.items()])
 
 
 def format_task(t: Task, h: str) -> Text:

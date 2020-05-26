@@ -16,6 +16,17 @@ class TaskDB:
         self.tasks[hash] = task
         return task, hash
 
+    def pop(self, hash: str):
+        return self.tasks.pop(hash), hash
+
+    def filter(self, *preds):
+        for pred in preds:
+            self.tasks = {k: t for k, t in self.tasks.items() if pred(t)}
+        return self
+
+    def dump(self):
+        return yaml.dump({h: t.to_dict() for h, t in self.tasks.items()})
+
     def _hash(self, entry: str, salt: int) -> str:
         salt = str(salt).encode()
         hash = int(
@@ -24,12 +35,6 @@ class TaskDB:
         )
         format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
         return format_hash(hash)
-
-    def pop(self, hash: str):
-        return self.tasks.pop(hash), hash
-
-    def dump(self):
-        return yaml.dump({h: t.to_dict() for h, t in self.tasks.items()})
 
     def __repr__(self):
         all_tasks = "\n".join([f"{h}: {t}" for h, t in self.tasks.items()])
