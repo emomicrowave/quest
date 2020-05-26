@@ -8,7 +8,7 @@ from rich import print
 from typer import Typer, Option, Argument, Context
 from kobold.task import Task
 from kobold.taskdb import TaskDB
-from kobold.output import ListPrinter
+from kobold.output import ListPrinter, format_task
 
 app = Typer(add_completion=False)
 config = {"path": Path.home().joinpath("cloud/kobold.yaml"), "tdb": None}
@@ -19,6 +19,8 @@ def mark_task_done(hash: str):
     config["tdb"].tasks[hash].complete()
     with open(config["path"], "w") as f:
         f.writelines(config["tdb"].dump())
+    em = ":glowing_star:"
+    print(f"{em} Task complete! {em}")
 
 
 @app.command("edit")
@@ -42,14 +44,15 @@ def list_tasks(
 
 @app.command("new")
 def add_task(
-    entry: List[str],
+    entry: str,
     project: str = Option("void", "--project", "-p"),
     due: str = Option(None, "--due", "-d"),
 ):
-    task = Task(name=" ".join(entry), project=project, due=due)
-    config["tdb"].add_task(task)
+    task = Task(name=entry, project=project, due=due)
+    t, h = config["tdb"].add_task(task)
     with open(config["path"], "w") as f:
         f.writelines(config["tdb"].dump())
+    print(format_task(t, h))
 
 
 @app.command("track")

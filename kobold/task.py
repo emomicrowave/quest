@@ -3,7 +3,14 @@ from datetime import datetime
 
 
 class Task:
-    def __init__(self, name: str, project: str = "void", state: str = "todo", created: str = None, due: str = None):
+    def __init__(
+        self,
+        name: str,
+        project: str = "void",
+        state: str = "todo",
+        created: str = None,
+        due: str = None,
+    ):
         if len(name) == 0:
             error_msg = "Your entry is empty! You can't complete a task if there's no task to complete"
             raise ValueError(error_msg)
@@ -32,4 +39,3 @@ class Task:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
