@@ -25,7 +25,8 @@ def mark_task_done(hash: str):
 
 @app.command("edit")
 def edit_tasks_in_editor():
-    run([getenv("EDITOR", "vi"), config["path"]])
+    cmd = getenv("VISUAL", "vi").split()
+    run(cmd + [config["path"]])
 
 
 @app.command("rm")
