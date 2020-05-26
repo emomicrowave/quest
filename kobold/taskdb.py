@@ -25,8 +25,8 @@ class TaskDB:
         format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
         return format_hash(hash)
 
-    def remove_task(self, hash: str):
-        self.tasks.pop(hash)
+    def pop(self, hash: str):
+        return self.tasks.pop(hash), hash
 
     def dump(self):
         return yaml.dump({h: t.to_dict() for h, t in self.tasks.items()})
@@ -34,3 +34,21 @@ class TaskDB:
     def __repr__(self):
         all_tasks = "\n".join([f"{h}: {t}" for h, t in self.tasks.items()])
         return all_tasks
+
+class YamlDB:
+    def __init__(self, filename: str, mode: str = "r"):
+        assert mode in "rw"
+        self.filename = filename
+        self.mode = mode
+
+    def __enter__(self) -> TaskDB:
+        with open(self.filename, "r") as f:
+            tasks = yaml.load(f, Loader=yaml.Loader)
+        self.taskdb = TaskDB(tasks)
+        return self.taskdb
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None and self.mode == "w":
+            with open(self.filename, "w") as f:
+                f.writelines(self.taskdb.dump())
+

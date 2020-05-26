@@ -1,5 +1,6 @@
-from parse import findall
 import arrow
+from parse import findall
+from typing import Dict
 
 
 class Task:
@@ -30,7 +31,7 @@ class Task:
     def done(self) -> bool:
         return self.state == "done"
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict:
         return {k: v for k, v in self.__dict__.items() if v is not None}
 
     def complete(self):
