@@ -1,26 +1,50 @@
 #!/home/hgf/.miniconda/envs/ork/bin/python
 import yaml
+import arrow
 from subprocess import run
 from os import getenv
 from typing import List
 from pathlib import Path
 from rich import print
+from rich.text import Text
 from typer import Typer, Option, Argument, Context
 from kobold.task import Task
 from kobold.taskdb import TaskDB
 from kobold.output import ListPrinter, format_task
 
 app = Typer(add_completion=False)
+debug = Typer(add_completion=False)
+app.add_typer(debug, name="debug")
+
 config = {"path": Path.home().joinpath("cloud/kobold.yaml"), "tdb": None}
+
+
+@debug.command("xp")
+def debug_print_xp():
+    total_xp = sum([t.xp for t in config["tdb"].tasks.values() if t.done])
+    text = Text(f"{total_xp}xp", style="yellow")
+    print(text)
+
+
+@debug.command("daily_xp")
+def debug_print_daily_xp():
+    daily_xp = sum(
+        [
+            t.xp
+            for t in config["tdb"].tasks.values()
+            if t.done and arrow.get(t.completed).date() == arrow.now().date()
+        ]
+    )
+    print(f"[yellow]{daily_xp}xp")
 
 
 @app.command("done")
 def mark_task_done(hash: str):
-    config["tdb"].tasks[hash].complete()
+    t = config["tdb"].tasks[hash].complete()
     with open(config["path"], "w") as f:
         f.writelines(config["tdb"].dump())
     em = ":glowing_star:"
-    print(f"{em} Task complete! {em}")
+    print(f"{em} [yellow]{t.xp}xp {em}")
 
 
 @app.command("edit")
@@ -47,9 +71,11 @@ def list_tasks(
 def add_task(
     entry: str,
     project: str = Option("void", "--project", "-p"),
+    context: str = Option(None, "--context", "-c"),
+    xp: int = Option(1, "--xp", "-x"),
     due: str = Option(None, "--due", "-d"),
 ):
-    task = Task(name=entry, project=project, due=due)
+    task = Task(name=entry, project=project, context=context, xp=xp, due=due)
     t, h = config["tdb"].add_task(task)
     with open(config["path"], "w") as f:
         f.writelines(config["tdb"].dump())

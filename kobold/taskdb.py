@@ -29,7 +29,7 @@ class TaskDB:
         self.tasks.pop(hash)
 
     def dump(self):
-        return yaml.dump({k: v.dict for k, v in self.tasks.items()})
+        return yaml.dump({h: t.to_dict() for h, t in self.tasks.items()})
 
     def __repr__(self):
         all_tasks = "\n".join([f"{h}: {t}" for h, t in self.tasks.items()])

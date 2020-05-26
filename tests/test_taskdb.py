@@ -39,18 +39,6 @@ class TestTaskDBOpen:
         db.remove_task(hash)
         assert db.tasks == {}
 
-    def test_yaml_dump(self):
-        db = TaskDB({})
-        db.tasks = {"dead": Task(name="test", created="now")}
-        expected = (
-                "dead:\n"
-                "  created: now\n"
-                "  name: test\n"
-                "  project: void\n"
-                "  state: todo\n"
-                )
-        assert db.dump() == expected
-
     def test_repr(self):
         db = TaskDB({})
         db.tasks = {"dead": Task(name="test", created="now")}

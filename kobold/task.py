@@ -1,5 +1,5 @@
 from parse import findall
-from datetime import datetime
+import arrow
 
 
 class Task:
@@ -7,8 +7,11 @@ class Task:
         self,
         name: str,
         project: str = "void",
+        context: str = None,
         state: str = "todo",
+        xp: int = 1,
         created: str = None,
+        completed: str = None,
         due: str = None,
     ):
         if len(name) == 0:
@@ -17,19 +20,23 @@ class Task:
         self.name = name
         self.project = project
         self.state = state
-        self.created = created or datetime.now().strftime("%Y-%m-%dT%H:%M")
+        self.context = context
+        self.xp = xp
+        self.created = created or arrow.now().format("YYYY-MM-DDTHH:mm")
+        self.completed = completed or arrow.get(0).format("YYYY-MM-DDTHH:mm")
         self.due = due
 
     @property
     def done(self) -> bool:
         return self.state == "done"
 
-    @property
-    def dict(self) -> dict:
+    def to_dict(self) -> dict:
         return {k: v for k, v in self.__dict__.items() if v is not None}
 
-    def complete(self) -> None:
+    def complete(self):
         self.state = "done"
+        self.completed = arrow.now().format("YYYY-MM-DDTHH:mm")
+        return self
 
     def __str__(self):
         return f"{self.project}: {self.name}"
