@@ -9,7 +9,7 @@ from rich.text import Text
 from typer import Typer, Option, Argument, Context
 from kobold.task import Task
 from kobold.taskdb import YamlDB
-from kobold.output import ListPrinter, format_task, format
+from kobold.output import format
 
 kobold = Typer(add_completion=False)
 debug = Typer(add_completion=False)
@@ -58,7 +58,7 @@ def edit_tasks_in_editor():
 def remove_task(hash: str):
     with YamlDB(config["path"], "w") as tdb:
         t, h = tdb.pop(hash)
-    print(format_task(t, h))
+    print(format(t, h))
 
 
 @kobold.command("ls")
@@ -80,7 +80,7 @@ def add_task(
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
     with YamlDB(config["path"], "w") as tdb:
         t, h = tdb.add_task(task)
-    print(format_task(t, h))
+    print(format(t, h))
 
 
 @kobold.command("track")
