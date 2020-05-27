@@ -11,7 +11,7 @@ from kobold.task import Task
 from kobold.taskdb import YamlDB
 from kobold.output import format
 
-kobold = Typer(add_completion=False)
+kobold = Typer()
 debug = Typer(add_completion=False)
 kobold.add_typer(debug, name="debug")
 
@@ -26,8 +26,8 @@ def debug_print_xp():
     print(text)
 
 
-@debug.command("daily_xp")
-def debug_print_daily_xp():
+@kobold.command("summary")
+def summary():
     with YamlDB(config["path"], "r") as tdb:
         daily_xp = sum(
             [
@@ -36,7 +36,7 @@ def debug_print_daily_xp():
                 if t.done and arrow.get(t.completed).date() == arrow.now().date()
             ]
         )
-    text = Text(f"{daily_xp}xp", style="yellow")
+    text = Text(f"Daily XP: {daily_xp}xp", style="yellow")
     print(text)
 
 
@@ -65,8 +65,13 @@ def remove_task(hash: str):
 def list_tasks(
     hide_done: bool = Option(True), project: str = Option(None, "--project", "-p")
 ):
+    filters = []
+    if hide_done:
+        filters.append(lambda t: not t.done)
+    if project:
+        filters.append(lambda t: t.project == project)
     with YamlDB(config["path"], "r") as tdb:
-        print(format(tdb.filter(lambda t: not t.done)))
+        print(format(tdb.filter(filters)))
 
 
 @kobold.command("new")
@@ -79,7 +84,7 @@ def add_task(
 ):
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
     with YamlDB(config["path"], "w") as tdb:
-        t, h = tdb.add_task(task)
+        t, h = tdb.add(task)
     print(format(t, h))
 
 

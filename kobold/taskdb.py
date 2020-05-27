@@ -2,14 +2,14 @@ from .task import Task
 import parse
 import hashlib
 import yaml
-from typing import Dict
+from typing import Union, Dict
 
 
 class TaskDB:
-    def __init__(self, tasks: Dict[str, str]):
-        self.tasks = {k: Task(**v) for k, v in tasks.items()}
+    def __init__(self, tasks: Union[Dict[str, str], Dict[str, Task]]):
+        self.tasks = {k: (v if isinstance(v, Task) else Task(**v)) for k, v in tasks.items()}
 
-    def add_task(self, task: Task):
+    def add(self, task: Task):
         salt = 0
         while (hash := self._hash(str(task), salt)) in self.tasks.keys():
             salt += 1
@@ -19,13 +19,11 @@ class TaskDB:
     def pop(self, hash: str):
         return self.tasks.pop(hash), hash
 
-    def filter(self, *preds):
+    def filter(self, preds):
+        tasks = self.tasks
         for pred in preds:
-            self.tasks = {k: t for k, t in self.tasks.items() if pred(t)}
-        return self
-
-    def dump(self):
-        return yaml.dump({h: t.to_dict() for h, t in self.tasks.items()})
+            tasks = {k: t for k, t in tasks.items() if pred(t)}
+        return TaskDB(tasks)
 
     def _hash(self, entry: str, salt: int) -> str:
         salt = str(salt).encode()
@@ -33,8 +31,8 @@ class TaskDB:
             hashlib.blake2b(entry.encode(), digest_size=2, salt=salt).hexdigest(),
             base=16,
         )
-        format_hash = lambda h: f"{hex(h).lstrip('0x').zfill(4)}"
-        return format_hash(hash)
+        hash = hex(hash).lstrip('0x').zfill(4)
+        return hash
 
     def __repr__(self):
         all_tasks = "\n".join([f"{h}: {t}" for h, t in self.tasks.items()])
@@ -55,5 +53,6 @@ class YamlDB:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None and self.mode == "w":
             with open(self.filename, "w") as f:
-                f.writelines(self.taskdb.dump())
+                as_yaml = yaml.dump({h: t.to_dict() for h, t in self.taskdb.tasks.items()})
+                f.writelines(as_yaml)
 
