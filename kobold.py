@@ -1,51 +1,50 @@
 #!/home/hgf/.miniconda/envs/ork/bin/python
-import arrow
 from subprocess import run
 from os import getenv
-from typing import List
 from pathlib import Path
-from rich import print
-from rich.text import Text
 from typer import Typer, Option, Argument, Context
 from kobold.task import Task
 from kobold.taskdb import YamlDB
-from kobold.output import format
+from kobold.output import (
+    print_task,
+    print_taskdb,
+    print_summary,
+    print_all_xp,
+    print_reward,
+    print_agenda,
+)
 
 kobold = Typer()
 debug = Typer(add_completion=False)
 kobold.add_typer(debug, name="debug")
 
-config = {"path": Path.home().joinpath("cloud/kobold.yaml")}
+config = {"path": Path.home() / "cloud/kobold.yaml"}
 
 
 @debug.command("xp")
 def debug_print_xp():
     with YamlDB(config["path"], "r") as tdb:
-        total_xp = sum([t.xp for t in tdb.tasks.values() if t.done])
-    text = Text(f"{total_xp}xp", style="yellow")
-    print(text)
+        print_all_xp(tdb)
+
+
+@debug.command("agenda")
+def debug_agenda():
+    with YamlDB(config["path"], "r") as tdb:
+        print_agenda(tdb)
+
 
 
 @kobold.command("summary")
 def summary():
     with YamlDB(config["path"], "r") as tdb:
-        daily_xp = sum(
-            [
-                t.xp
-                for t in tdb.tasks.values()
-                if t.done and arrow.get(t.completed).date() == arrow.now().date()
-            ]
-        )
-    text = Text(f"Daily XP: {daily_xp}xp", style="yellow")
-    print(text)
+        print_summary(tdb)
 
 
 @kobold.command("done")
 def mark_task_done(hash: str):
     with YamlDB(config["path"], "w") as tdb:
-        t = tdb.tasks[hash].complete()
-    em = ":glowing_star:"
-    print(f"{em} [yellow]{t.xp}xp {em}")
+        task = tdb.tasks[hash].complete()
+        print_reward(task)
 
 
 @kobold.command("edit")
@@ -58,7 +57,7 @@ def edit_tasks_in_editor():
 def remove_task(hash: str):
     with YamlDB(config["path"], "w") as tdb:
         t, h = tdb.pop(hash)
-    print(format(t, h))
+        print_task(t, h)
 
 
 @kobold.command("ls")
@@ -71,7 +70,7 @@ def list_tasks(
     if project:
         filters.append(lambda t: t.project == project)
     with YamlDB(config["path"], "r") as tdb:
-        print(format(tdb.filter(filters)))
+        print_taskdb(tdb.filter(filters))
 
 
 @kobold.command("new")
@@ -85,7 +84,7 @@ def add_task(
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
     with YamlDB(config["path"], "w") as tdb:
         t, h = tdb.add(task)
-    print(format(t, h))
+        print_task(t, h)
 
 
 @kobold.command("track")
@@ -93,7 +92,7 @@ def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
     with YamlDB(config["path"], "r") as tdb:
         task = tdb.tasks[hash]
     entry = f"🥕 {task.project}: {task.name} {comment}".strip()
-    with open(Path.home().joinpath(".current_task"), "w") as f:
+    with open(Path.home() / ".current_task", "w") as f:
         f.write(entry)
 
 

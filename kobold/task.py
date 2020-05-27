@@ -24,7 +24,7 @@ class Task:
         self.context = context
         self.xp = xp
         self.created = created or arrow.now().format("YYYY-MM-DDTHH:mm")
-        self.completed = completed or arrow.get(0).format("YYYY-MM-DDTHH:mm")
+        self.completed = completed
         self.due = due
 
     @property

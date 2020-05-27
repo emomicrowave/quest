@@ -2,11 +2,14 @@ from .task import Task
 import parse
 import hashlib
 import yaml
+import arrow
 from typing import Union, Dict
+from pathlib import Path
 
 
 class TaskDB:
     def __init__(self, tasks: Union[Dict[str, str], Dict[str, Task]]):
+        tasks = tasks or {}
         self.tasks = {k: (v if isinstance(v, Task) else Task(**v)) for k, v in tasks.items()}
 
     def add(self, task: Task):
@@ -44,9 +47,18 @@ class YamlDB:
         self.filename = filename
         self.mode = mode
 
+    def backup(self, content):
+        backup_name = Path.home() / ".local/share/kobold" / f"kobold_backup_{arrow.now().format('YYYY-MM-DDTHH-mm-ss')}"
+        with open(backup_name, "w") as f:
+            f.write(content)
+
     def __enter__(self) -> TaskDB:
         with open(self.filename, "r") as f:
             tasks = yaml.load(f, Loader=yaml.Loader)
+            f.seek(0)
+            content = f.read()
+        if self.mode == "w":
+            self.backup(content)
         self.taskdb = TaskDB(tasks)
         return self.taskdb
 
