@@ -55,8 +55,8 @@ def print_summary(tdb: TaskDB):
             if t.done and arrow.get(t.completed).date() == arrow.now().date()
         ]
     )
-    text = Text(f"Daily: {daily_xp}xp", style="yellow")
-    print(text)
+    reward = Text(f"{daily_xp}xp", style="bold yellow")
+    print("Daily:", reward)
 
 def print_all_xp(tdb: TaskDB):
     total_xp = sum([t.xp for t in tdb.tasks.values() if t.done])
@@ -65,7 +65,8 @@ def print_all_xp(tdb: TaskDB):
 
 def print_reward(task: Task):
     em = ":glowing_star:"
-    print(f"{em} [yellow]{task.xp}xp {em}")
+    reward = Text(f"{task.xp}xp", style="bold yellow")
+    print(em, reward, em)
 
 def print_agenda(tdb: TaskDB):
     is_today = lambda t: t.due is not None and arrow.get(t.due).isocalendar()[:2] == arrow.now().isocalendar()[:2]

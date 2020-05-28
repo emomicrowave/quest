@@ -78,7 +78,7 @@ def add_task(
     entry: str,
     project: str = Option("void", "--project", "-p"),
     context: str = Option(None, "--context", "-c"),
-    xp: int = Option(1, "--xp", "-x"),
+    xp: float = Option(1, "--xp", "-x"),
     due: str = Option(None, "--due", "-d"),
 ):
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
