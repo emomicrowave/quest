@@ -31,13 +31,19 @@ class Task:
     def done(self) -> bool:
         return self.state == "done"
 
-    def to_dict(self) -> Dict:
-        return {k: v for k, v in self.__dict__.items() if v is not None}
+    @property
+    def state(self) -> str:
+        return self._state
 
-    def complete(self):
-        self.state = "done"
-        self.completed = arrow.now().format("YYYY-MM-DDTHH:mm")
-        return self
+    @state.setter
+    def state(self, value: str):
+        assert value in ["todo", "in_progress", "done"]
+        if value == "done":
+            self.completed = arrow.now().format("YYYY-MM-DDTHH:mm")
+        self._state = value
+
+    def to_dict(self) -> Dict:
+        return {k.lstrip("_"): v for k, v in self.__dict__.items() if v is not None}
 
     def __str__(self):
         return f"{self.project}: {self.name}"

@@ -18,6 +18,13 @@ def debug_print_xp():
         output.all_xp(tdb)
 
 
+@debug.command("start")
+def debug_start_task(hash: str):
+    with YamlDB(config["path"], "w") as tdb:
+        task = tdb.tasks[hash]
+        task.state = "in_progress"
+
+
 @debug.command("agenda")
 def debug_agenda():
     with YamlDB(config["path"], "r") as tdb:
@@ -33,8 +40,9 @@ def summary():
 @kobold.command("done")
 def mark_task_done(hash: str):
     with YamlDB(config["path"], "w") as tdb:
-        task = tdb.tasks[hash].complete()
-        output.reward(task)
+        task = tdb.tasks[hash]
+        task.state = "done"
+    output.reward(task)
 
 
 @kobold.command("edit")
