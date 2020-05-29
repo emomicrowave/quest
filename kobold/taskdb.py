@@ -28,6 +28,22 @@ class TaskDB:
         tasks = {k: t for k, t in self.tasks.items() if predicate(t)}
         return TaskDB(tasks)
 
+    @property
+    def xp(self) -> int:
+        return int(sum([t.xp for h, t in self]))
+
+    def __getitem__(self, index) -> Task:
+        return self.tasks[index]
+
+    def __iter__(self) -> Task:
+        due, rest = {}, {}
+        for h, t in self.tasks.items():
+            (due if t.due else rest)[h] = t
+        due = [(h, t) for h, t in sorted(due.items(), key=lambda x: x[1].due)]
+        rest = [(h, t) for h, t in sorted(rest.items(), key=lambda x: x[1].project)]
+        yield from due + rest
+
+
     def _hash(self, entry: str, salt: int) -> str:
         salt = str(salt).encode()
         hash = int(

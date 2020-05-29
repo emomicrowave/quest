@@ -2,7 +2,7 @@ import pytest
 from dataclasses import dataclass
 
 from context import kobold
-from kobold.task import Task
+from kobold import Task
 
 
 def test_create_empty_task():
@@ -12,11 +12,6 @@ def test_create_empty_task():
 def test_not_done():
     t = Task(name="test", project="test", state="todo", created="now", due="tomorrow")
     assert not t.done
-
-def test_complete():
-    t = Task(name="test", project="test", state="todo", created="now", due="tomorrow")
-    t.complete()
-    assert t.done
 
 def test_project():
     t = Task(name="test", project="test_project", state="todo", created="now", due="tomorrow")

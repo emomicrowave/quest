@@ -6,10 +6,5 @@ Task management meets yak shaving.
 
 ### Achievements
 
-Achievements could either be:
-
-1. Fully dynamic
-
-As in, there is no stored state information on achievements, it is *always* calculated on
-demand.
-
+Achievements will be checked when completing an exercise and added as additional entries
+in the yaml file when necessary. For now, no achievements will be implemented.

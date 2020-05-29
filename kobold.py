@@ -3,7 +3,7 @@ from subprocess import run
 from os import getenv
 from pathlib import Path
 from typer import Typer, Option, Argument, Context
-from kobold import output, Task, YamlDB
+from kobold import output, Task, YamlDB, filters
 
 kobold = Typer()
 debug = Typer(add_completion=False)
@@ -18,17 +18,23 @@ def debug_print_xp():
         output.all_xp(tdb)
 
 
-@debug.command("start")
-def debug_start_task(hash: str):
+@kobold.command("edit")
+def debug_edit(
+    hash: str,
+    project: str = Option(None, "--project", "-p"),
+    context: str = Option(None, "--context", "-c"),
+    xp: int = Option(None, "--xp", "-x"),
+    due: str = Option(None, "--due", "-d"),
+    state: str = Option(None, "--state", "-s"),
+):
     with YamlDB(config["path"], "w") as tdb:
-        task = tdb.tasks[hash]
-        task.state = "in_progress"
-
-
-@debug.command("agenda")
-def debug_agenda():
-    with YamlDB(config["path"], "r") as tdb:
-        output.agenda(tdb)
+        t = tdb[hash]
+        t.xp = xp or t.xp
+        t.due = due or t.due
+        t.project = project or t.project
+        t.context = context or t.context
+        t.state = state or t.state
+        output.task(t, hash)
 
 
 @kobold.command("summary")
@@ -40,15 +46,9 @@ def summary():
 @kobold.command("done")
 def mark_task_done(hash: str):
     with YamlDB(config["path"], "w") as tdb:
-        task = tdb.tasks[hash]
+        task = tdb[hash]
         task.state = "done"
     output.reward(task)
-
-
-@kobold.command("edit")
-def edit_tasks_in_editor():
-    cmd = getenv("VISUAL", "vi").split()
-    run(cmd + [config["path"]])
 
 
 @kobold.command("rm")
@@ -88,7 +88,7 @@ def add_task(
 @kobold.command("track")
 def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
     with YamlDB(config["path"], "r") as tdb:
-        task = tdb.tasks[hash]
+        task = tdb[hash]
     entry = f"🥕 {task.project}: {task.name} {comment}".strip()
     with open(Path.home() / ".current_task", "w") as f:
         f.write(entry)
@@ -98,6 +98,15 @@ def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
 def callback(ctx: Context):
     if ctx.invoked_subcommand is None:
         summary()
+
+
+@kobold.command("kanban")
+def print_kanban(
+    week: bool = Option(True, "--week", "-w"),
+    today: bool = Option(False, "--today", "-t"),
+):
+    with YamlDB(config["path"], "r") as tdb:
+        output.kanban(tdb, week=week, today=today)
 
 
 if __name__ == "__main__":
