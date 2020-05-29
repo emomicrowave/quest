@@ -42,32 +42,33 @@ def _(tdb: TaskDB) -> Text:
     rest  = [format(t, h) for h, t in sorted(rest.items(), key=lambda x: x[1].project)]
     return Text("\n").join(due + rest)
 
-def print_taskdb(tdb: TaskDB):
+def taskdb(tdb: TaskDB):
     print(format(tdb))
 
-def print_task(task: Task, hash: str):
+def task(task: Task, hash: str):
     print(format(task, hash))
 
-def print_summary(tdb: TaskDB):
-    print_daily_xp(tdb)
-    print_agenda(tdb)
+def summary(tdb: TaskDB):
+    daily_xp(tdb)
+    agenda(tdb)
 
-def print_all_xp(tdb: TaskDB):
+def all_xp(tdb: TaskDB):
     total_xp = sum([t.xp for t in tdb.tasks.values() if t.done])
     text = Text(f"{total_xp}xp", style="yellow")
     print(text)
 
-def print_reward(task: Task):
+def reward(task: Task):
     em = ":glowing_star:"
     reward = Text(f"{task.xp}xp", style="bold yellow")
     print(em, reward, em)
 
-def print_agenda(tdb: TaskDB):
-    is_today = lambda t: t.due is not None and arrow.get(t.due).isocalendar()[:2] == arrow.now().isocalendar()[:2]
+def agenda(tdb: TaskDB):
+    is_this_week = lambda t: t.due is not None and arrow.get(t.due).isocalendar()[:2] == arrow.now().isocalendar()[:2]
     is_todo = lambda t: t.state == "todo"
-    print(format(tdb.filter([is_today, is_todo])))
+    predicate = lambda t: all([p(t) for p in [is_todo, is_this_week]])
+    print(format(tdb.filter(predicate)))
 
-def print_daily_xp(tdb: TaskDB):
+def daily_xp(tdb: TaskDB):
     total = 10
     daily = sum(
         [

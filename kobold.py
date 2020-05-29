@@ -3,16 +3,7 @@ from subprocess import run
 from os import getenv
 from pathlib import Path
 from typer import Typer, Option, Argument, Context
-from kobold.task import Task
-from kobold.taskdb import YamlDB
-from kobold.output import (
-    print_task,
-    print_taskdb,
-    print_summary,
-    print_all_xp,
-    print_reward,
-    print_agenda,
-)
+from kobold import output, Task, YamlDB
 
 kobold = Typer()
 debug = Typer(add_completion=False)
@@ -24,27 +15,26 @@ config = {"path": Path.home() / "cloud/kobold.yaml"}
 @debug.command("xp")
 def debug_print_xp():
     with YamlDB(config["path"], "r") as tdb:
-        print_all_xp(tdb)
+        output.all_xp(tdb)
 
 
 @debug.command("agenda")
 def debug_agenda():
     with YamlDB(config["path"], "r") as tdb:
-        print_agenda(tdb)
-
+        output.agenda(tdb)
 
 
 @kobold.command("summary")
 def summary():
     with YamlDB(config["path"], "r") as tdb:
-        print_summary(tdb)
+        output.summary(tdb)
 
 
 @kobold.command("done")
 def mark_task_done(hash: str):
     with YamlDB(config["path"], "w") as tdb:
         task = tdb.tasks[hash].complete()
-        print_reward(task)
+        output.reward(task)
 
 
 @kobold.command("edit")
@@ -57,7 +47,7 @@ def edit_tasks_in_editor():
 def remove_task(hash: str):
     with YamlDB(config["path"], "w") as tdb:
         t, h = tdb.pop(hash)
-        print_task(t, h)
+        output.task(t, h)
 
 
 @kobold.command("ls")
@@ -70,7 +60,7 @@ def list_tasks(
     if project:
         filters.append(lambda t: t.project == project)
     with YamlDB(config["path"], "r") as tdb:
-        print_taskdb(tdb.filter(filters))
+        output.taskdb(tdb.filter(lambda t: all([f(t) for f in filters])))
 
 
 @kobold.command("new")
@@ -84,7 +74,7 @@ def add_task(
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
     with YamlDB(config["path"], "w") as tdb:
         t, h = tdb.add(task)
-        print_task(t, h)
+        output.task(t, h)
 
 
 @kobold.command("track")
