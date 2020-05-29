@@ -99,7 +99,7 @@ def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
 @kobold.callback(invoke_without_command=True)
 def callback(ctx: Context):
     if ctx.invoked_subcommand is None:
-        list_tasks(True, None)
+        summary()
 
 
 if __name__ == "__main__":

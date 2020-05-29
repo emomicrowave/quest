@@ -23,9 +23,8 @@ class TaskDB:
         return self.tasks.pop(hash), hash
 
     def filter(self, preds):
-        tasks = self.tasks
-        for pred in preds:
-            tasks = {k: t for k, t in tasks.items() if pred(t)}
+        pred = lambda t: all([p(t) for p in preds])
+        tasks = {k: t for k, t in self.tasks.items() if pred(t)}
         return TaskDB(tasks)
 
     def _hash(self, entry: str, salt: int) -> str:

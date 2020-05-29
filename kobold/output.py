@@ -4,6 +4,7 @@ from .task import Task
 import arrow
 from rich import print
 from rich.text import Text
+from rich.bar import Bar
 from functools import singledispatch
 
 
@@ -29,7 +30,7 @@ def _(t: Task, h: str) -> Text:
             due = due.humanize(granularity=["day"])
         due = Text(f"{due}", style="yellow")
     else:
-        due = Text("")
+        due = ""
     return Text(" ").join([hash, project, name, due])
 
 @format.register
@@ -48,15 +49,8 @@ def print_task(task: Task, hash: str):
     print(format(task, hash))
 
 def print_summary(tdb: TaskDB):
-    daily_xp = sum(
-        [
-            t.xp
-            for t in tdb.tasks.values()
-            if t.done and arrow.get(t.completed).date() == arrow.now().date()
-        ]
-    )
-    reward = Text(f"{daily_xp}xp", style="bold yellow")
-    print("Daily:", reward)
+    print_daily_xp(tdb)
+    print_agenda(tdb)
 
 def print_all_xp(tdb: TaskDB):
     total_xp = sum([t.xp for t in tdb.tasks.values() if t.done])
@@ -73,3 +67,22 @@ def print_agenda(tdb: TaskDB):
     is_todo = lambda t: t.state == "todo"
     print(format(tdb.filter([is_today, is_todo])))
 
+def print_daily_xp(tdb: TaskDB):
+    total = 10
+    daily = sum(
+        [
+            t.xp
+            for t in tdb.tasks.values()
+            if t.done and arrow.get(t.completed).date() == arrow.now().date()
+        ]
+    )
+    bar = Bar(
+            total=total,
+            completed=daily,
+            width=30,
+            style="bright_black",
+            complete_style="yellow",
+            finished_style="green",
+            )
+    progress = Text(f" {daily}/{total}", style="yellow")
+    print(bar, progress)

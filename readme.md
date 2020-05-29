@@ -4,6 +4,8 @@ Task management meets yak shaving.
 
 ## Brainstorming
 
+### Achievements
+
 Achievements could either be:
 
 1. Fully dynamic
