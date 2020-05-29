@@ -14,9 +14,38 @@ style_default = "white"
 style_hash = {"todo": "green", "in_progress": "yellow", "done": "bright_black"}
 style_project = "blue"
 style_done = "bright_black"
-style_date = "yellow"
+style_future = "yellow"
+style_past = "magenta"
 style_xp = "yellow"
 style_bar = {"bg": "bright_black", "complete": "yellow", "finished": "green"}
+
+
+def task_date(t: Task) -> Text:
+    if t.state == "done":
+        date = arrow.get(t.completed)
+        style = style_past
+    elif t.due:
+        date = arrow.get(t.due)
+        style = style_future
+    else:
+        return ""
+    now = arrow.now()
+    if date.hour == 0 and date.minute == 0:
+        date = date.ceil("day")
+        now = date.ceil("day")
+    if date.isocalendar()[1] == now.isocalendar()[1]:
+        date = date.humanize(granularity=["day"]) + " (" + date.format("ddd") + ")"
+    else:
+        date = date.humanize(granularity=["day"])
+    # prettier
+    if "in a day" in date:
+        date = "tomorrow"
+    elif "a day ago" in date:
+        date = "yesterday"
+    elif "0 days" in date:
+        date = "today"
+    date = Text(f"{date}", style=style)
+    return date
 
 
 @singledispatch
@@ -31,19 +60,8 @@ def _(t: Task, h: str) -> Text:
     hash = Text(h, style=style_hash.get(t.state, style_default))
     project = Text(f"{t.project}:", style=style_project)
     name = Text(t.name)
-    if t.due:
-        due = arrow.get(t.due)
-        now = arrow.now()
-        if due.hour == 0 and due.minute == 0:
-            due = due.ceil("day")
-        if due.isocalendar()[1] == now.isocalendar()[1]:
-            due = due.humanize(granularity=["day"]) + " (" + due.format("ddd") + ")"
-        else:
-            due = due.humanize(granularity=["day"])
-        due = Text(f"{due}", style=style_date)
-    else:
-        due = ""
-    return Text(" ").join([hash, project, name, due])
+    date = task_date(t)
+    return Text(" ").join([hash, project, name, date])
 
 
 @format.register
@@ -101,7 +119,8 @@ def kanban(tdb: TaskDB, week=False, today=False):
         (not week or filters.due_this_week(t)) and (not today or filters.due_today(t))
     )
     completed_p = lambda t: (
-        (not week or filters.completed_this_week(t)) and (not today or filters.completed_today(t))
+        (not week or filters.completed_this_week(t))
+        and (not today or filters.completed_today(t))
     )
     todo = tdb.filter(lambda t: due_p(t) and t.state == "todo")
     in_progress = tdb.filter(lambda t: due_p(t) and t.state == "in_progress")

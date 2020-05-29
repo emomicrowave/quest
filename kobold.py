@@ -26,6 +26,7 @@ def debug_edit(
     xp: int = Option(None, "--xp", "-x"),
     due: str = Option(None, "--due", "-d"),
     state: str = Option(None, "--state", "-s"),
+    completed: str = Option(None, "--completed"),
 ):
     with YamlDB(config["path"], "w") as tdb:
         t = tdb[hash]
@@ -34,6 +35,7 @@ def debug_edit(
         t.project = project or t.project
         t.context = context or t.context
         t.state = state or t.state
+        t.completed = completed or t.completed
         output.task(t, hash)
 
 
