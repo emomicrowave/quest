@@ -15,12 +15,13 @@ config = load_user_configuration()
 
 @trello_app.command("boards")
 def trello_boards():
-    trello.get_boards()
+    trello.get_boards(config.trello)
 
 
 @trello_app.command("cards")
 def trello_cards():
-    trello.get_cards()
+    tdb = trello.tasks(config.trello)
+    output.taskdb(tdb.filter(filters.todo))
 
 
 @debug_app.command("xp")
