@@ -63,7 +63,10 @@ def format_tdb(tdb: TaskDB) -> Text:
     return Text("\n").join([format_task(t, h) for h, t in tdb])
 
 
-def taskdb(tdb: TaskDB):
+def taskdb(tdb: TaskDB, project: str = None):
+    tdb = tdb.filter(filters.todo)
+    if project:
+        tdb = tdb.filter(lambda t: t.project == project)
     print(format_tdb(tdb))
 
 

@@ -1,6 +1,6 @@
 #!/home/hgf/.miniconda/envs/ork/bin/python
 from typer import Typer, Option, Argument, Context
-from kobold import output, Task, YamlDB, filters, load_user_configuration
+from kobold import output, Task, YamlDB, load_user_configuration
 import kobold.trello as trello
 
 
@@ -21,7 +21,7 @@ def trello_boards():
 @trello_app.command("cards")
 def trello_cards():
     tdb = trello.tasks(config.trello)
-    output.taskdb(tdb.filter(filters.todo))
+    output.taskdb(tdb)
 
 
 @debug_app.command("xp")
@@ -84,13 +84,8 @@ def remove_task(hash: str):
 def list_tasks(
     hide_done: bool = Option(True), project: str = Option(None, "--project", "-p")
 ):
-    filters = []
-    if hide_done:
-        filters.append(lambda t: not t.done)
-    if project:
-        filters.append(lambda t: t.project == project)
     with YamlDB(config.path, "r") as tdb:
-        output.taskdb(tdb.filter(lambda t: all([f(t) for f in filters])))
+        output.taskdb(tdb, project)
 
 
 @kobold.command("new")

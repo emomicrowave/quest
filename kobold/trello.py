@@ -19,7 +19,7 @@ def request(url, config):
 def get_boards(config):
     response = request(boards, config)
     content = json.loads(response.content)
-    print('\n'.join([f"{board['id']}: {board['name']}" for board in content]))
+    print("\n".join([f"{board['id']}: {board['name']}" for board in content]))
 
 
 def get_cards(config):
@@ -30,14 +30,16 @@ def get_cards(config):
 
 def tasks(config) -> TaskDB:
     cards = get_cards(config)
-    board = lambda c: config['ids'][c['idBoard']]
+    board = lambda c: config["ids"][c["idBoard"]]
+
     def to_task(c):
         return Task(
-                name = c['name'],
-                project = board(c)['name'],
-                due = c['due'],
-                state = "done" if c['idList'] == board(c)['done'] else "todo"
-                )
+            name=c["name"],
+            project=board(c)["name"],
+            due=c["due"],
+            state="done" if c["idList"] == board(c)["done"] else "todo",
+        )
+
     tdb = TaskDB({})
     for c in cards:
         tdb.add(to_task(c))
