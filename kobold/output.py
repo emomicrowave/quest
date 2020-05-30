@@ -28,7 +28,7 @@ def task_date(t: Task) -> Text:
         date = arrow.get(t.due)
         style = style_future
     else:
-        return ""
+        return Text("")
     now = arrow.now()
     if date.hour == 0 and date.minute == 0:
         date = date.ceil("day")
@@ -48,33 +48,27 @@ def task_date(t: Task) -> Text:
     return date
 
 
-@singledispatch
-def format(arg, *args) -> Text:
-    return ""
-
-
-@format.register
-def _(t: Task, h: str) -> Text:
-    # if t.done:
-    # return Text(f"{h} {t}", style=style_done)
+def format_task(t: Task, h: str) -> Text:
+    if not isinstance(t, Task):
+        return Text("")
     hash = Text(h, style=style_hash.get(t.state, style_default))
     project = Text(f"{t.project}:", style=style_project)
     name = Text(t.name)
     date = task_date(t)
-    return Text(" ").join([hash, project, name, date])
+    task = Text(" ").join([p for p in [hash, project, name, date] if len(p) > 0])
+    return task
 
 
-@format.register
-def _(tdb: TaskDB) -> Text:
-    return Text("\n").join([format(t, h) for h, t in tdb])
+def format_tdb(tdb: TaskDB) -> Text:
+    return Text("\n").join([format_task(t, h) for h, t in tdb])
 
 
 def taskdb(tdb: TaskDB):
-    print(format(tdb))
+    print(format_tdb(tdb))
 
 
 def task(task: Task, hash: str):
-    print(format(task, hash))
+    print(format_task(task, hash))
 
 
 def summary(tdb: TaskDB):
@@ -90,12 +84,12 @@ def all_xp(tdb: TaskDB):
 def reward(task: Task):
     em = ":shooting_star:"
     reward = Text(f"{task.xp}", style=style_xp)
-    print(format(task, ""), reward, em)
+    print(format_task(task, ""), reward, em)
 
 
 def agenda(tdb: TaskDB):
     predicate = lambda t: filters.todo(t) and filters.due_this_week(t)
-    print(format(tdb.filter(predicate)))
+    print(format_tdb(tdb.filter(predicate)))
 
 
 def daily_xp(tdb: TaskDB):
@@ -133,6 +127,6 @@ def kanban(tdb: TaskDB, week=False, today=False):
     )
     zipped = zip_longest(todo, in_progress, done, fillvalue="__")
     for tasks in zipped:
-        formatted = [format(t, h) for h, t in tasks]
+        formatted = [format_task(t, h) for h, t in tasks]
         table.add_row(*formatted)
     print(table)

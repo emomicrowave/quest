@@ -43,7 +43,6 @@ class TaskDB:
         rest = [(h, t) for h, t in sorted(rest.items(), key=lambda x: x[1].project)]
         yield from due + rest
 
-
     def _hash(self, entry: str, salt: int) -> str:
         salt = str(salt).encode()
         hash = int(
