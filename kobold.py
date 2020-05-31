@@ -4,41 +4,34 @@ from kobold import output, Task, YamlDB, load_user_configuration
 import kobold.trello as trello
 
 
-kobold = Typer()
-debug_app = Typer(name="kobold", add_completion=False)
+kobold = Typer(help="A commandline dwelling kobold taskmaster.", add_completion=False)
 trello_app = Typer()
-kobold.add_typer(debug_app, name="debug")
-kobold.add_typer(trello_app, name="trello")
+debug_app = Typer()
+
+kobold.add_typer(debug_app, name="debug", help="Debug commands.")
+kobold.add_typer(trello_app, name="trello", help="Trello functionality.")
 
 config = load_user_configuration()
 
 
-@trello_app.command("boards")
+@trello_app.command("boards", help="List Trello boards.")
 def trello_boards():
     trello.get_boards(config.trello)
 
 
-@trello_app.command("cards")
+@trello_app.command("cards", help="List Trello cards.")
 def trello_cards():
     tdb = trello.tasks(config.trello)
     output.taskdb(tdb)
 
 
-@debug_app.command("xp")
+@debug_app.command("xp", help="List all rewarded XP.")
 def debug_app_print_xp():
     with YamlDB(config.path, "r") as tdb:
         output.all_xp(tdb)
 
 
-@debug_app.command("config")
-def debug_load_config():
-    config = load_user_configuration()
-    from IPython import embed
-
-    embed()
-
-
-@kobold.command("edit")
+@kobold.command("edit", help="Edit properties of existing tasks.")
 def debug_edit(
     hash: str,
     project: str = Option(None, "--project", "-p"),
@@ -59,13 +52,13 @@ def debug_edit(
         output.task(t, hash)
 
 
-@kobold.command("summary")
+@kobold.command("summary", help="Print daily summary.")
 def summary():
     with YamlDB(config.path, "r") as tdb:
         output.summary(tdb)
 
 
-@kobold.command("done")
+@kobold.command("done", help="Mark a task as done.")
 def mark_task_done(hash: str):
     with YamlDB(config.path, "w") as tdb:
         task = tdb[hash]
@@ -73,14 +66,14 @@ def mark_task_done(hash: str):
     output.reward(task)
 
 
-@kobold.command("rm")
+@kobold.command("rm", help="Remove a task from the database entirely.")
 def remove_task(hash: str):
     with YamlDB(config.path, "w") as tdb:
         t, h = tdb.pop(hash)
         output.task(t, h)
 
 
-@kobold.command("ls")
+@kobold.command("ls", help="List all open tasks.")
 def list_tasks(
     hide_done: bool = Option(True), project: str = Option(None, "--project", "-p")
 ):
@@ -88,7 +81,7 @@ def list_tasks(
         output.taskdb(tdb, project)
 
 
-@kobold.command("new")
+@kobold.command("new", help="Create a new task.")
 def add_task(
     entry: str,
     project: str = Option("void", "--project", "-p"),
@@ -102,7 +95,7 @@ def add_task(
         output.task(t, h)
 
 
-@kobold.command("track")
+@kobold.command("track", help="Write task to tracking file.")
 def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
     with YamlDB(config.path, "r") as tdb:
         task = tdb[hash]
@@ -111,7 +104,7 @@ def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
         f.write(entry)
 
 
-@kobold.command("kanban")
+@kobold.command("kanban", help="Print tasks as kanban board.")
 def print_kanban(
     week: bool = Option(True, "--week", "-w"),
     today: bool = Option(False, "--today", "-t"),
