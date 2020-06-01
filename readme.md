@@ -2,6 +2,9 @@
 
 Task management meets yak shaving.
 
+Disclaimer: this project isn't really meant for use by anyone else. It contains some
+nonsensical things, like the shebang in `kobold.py`.
+
 ## Quick start:
 
 ```
