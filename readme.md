@@ -2,9 +2,18 @@
 
 Task management meets yak shaving.
 
-## Brainstorming
+## Quick start:
 
-### Achievements
+```
+$ kobold --help
+...
 
-Achievements will be checked when completing an exercise and added as additional entries
-in the yaml file when necessary. For now, no achievements will be implemented.
+$ kobold new "learn a new song" --project bass --due 2020-05-31
+29a0 bass: learn a new song in 29 days
+
+$ kobold ls
+29a0 bass: learn a new song in 29 days
+
+$ kobold done 29a0
+bass: learn a new song today 1.0 🌠
+```
