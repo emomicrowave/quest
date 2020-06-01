@@ -17,7 +17,7 @@ class TaskDB:
 
     def add(self, task: Task) -> Tuple[Task, str]:
         salt = 0
-        while (hash := self._hash(str(task), bytes(salt))) in self.tasks.keys():
+        while (hash := self._hash(str(task), bytes([salt]))) in self.tasks.keys():
             salt += 1
         self.tasks[hash] = task
         return task, hash
@@ -32,6 +32,9 @@ class TaskDB:
     @property
     def xp(self) -> int:
         return int(sum([t.xp for h, t in self]))
+
+    def __len__(self) -> int:
+        return len(self.tasks)
 
     def __getitem__(self, index) -> Task:
         return self.tasks[index]
