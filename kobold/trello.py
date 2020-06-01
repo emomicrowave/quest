@@ -40,7 +40,7 @@ def tasks(config) -> TaskDB:
             state="done" if c["idList"] == board(c)["done"] else "todo",
         )
 
-    tdb = TaskDB({})
+    tdb = TaskDB()
     for c in cards:
         tdb.add(to_task(c))
     return tdb

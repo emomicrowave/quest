@@ -14,8 +14,9 @@ style_default = "white"
 style_hash = {"todo": "green", "in_progress": "yellow", "done": "bright_black"}
 style_project = "blue"
 style_done = "bright_black"
+style_early_bird = "green"
 style_due = "yellow"
-style_overdue = "bright_red bold"
+style_overdue = "bright_red"
 style_completed = "magenta"
 style_xp = "yellow"
 style_bar = {"bg": "bright_black", "complete": "yellow", "finished": "green"}
@@ -27,7 +28,12 @@ def task_date(t: Task) -> Text:
         style = style_completed
     elif t.due:
         date = arrow.get(t.due)
-        style = style_due if date >= arrow.now().ceil("day") else style_overdue
+        if filters.overdue(t):
+            style = style_overdue
+        elif filters.due_remaining(t, 2):
+            style = style_early_bird
+        else:
+            style = style_due
     else:
         return Text("")
     now = arrow.now()
@@ -92,7 +98,9 @@ def reward(task: Task):
 
 
 def agenda(tdb: TaskDB):
-    predicate = lambda t: filters.todo(t) and (filters.due_this_week(t) or filters.overdue(t))
+    predicate = lambda t: filters.todo(t) and (
+        filters.due_this_week(t) or filters.overdue(t)
+    )
     print(format_tdb(tdb.filter(predicate)))
 
 

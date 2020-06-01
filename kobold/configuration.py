@@ -5,17 +5,11 @@ from typing import Dict
 from pathlib import Path
 
 
-defaults = {
-    "path": "~/.kobold.yaml",
-    "trello": {},
-}
-
-
 @dataclass
 class Config:
-    path: str
-    trello: Dict
-    taskfile: Path = None
+    path: str = field(default=xdg.XDG_DATA_HOME / "kobold/tasks.yaml")
+    trello: Dict = field(default_factory=dict)
+    taskfile: Path = field(default=xdg.XDG_DATA_HOME / "kobold/taskfile")
 
     def __post_init__(self):
         self.path = Path(self.path).expanduser()
@@ -27,4 +21,4 @@ def load_user_configuration() -> Config:
     config_path = xdg.XDG_CONFIG_HOME / "kobold.yaml"
     with open(config_path, "r") as f:
         config = yaml.load(f, Loader=yaml.Loader)
-    return Config(**{**defaults, **config})
+    return Config(**config)

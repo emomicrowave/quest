@@ -3,28 +3,29 @@ import parse
 import hashlib
 import yaml
 import arrow
-from typing import Union, Dict
+import xdg
+from typing import Union, Dict, Tuple, Callable
 from pathlib import Path
 
 
 class TaskDB:
-    def __init__(self, tasks: Union[Dict[str, str], Dict[str, Task]]):
-        tasks = tasks or {}
+    def __init__(self, tasks: Dict = None):
+        tasks = tasks or dict()
         self.tasks = {
             k: (v if isinstance(v, Task) else Task(**v)) for k, v in tasks.items()
         }
 
-    def add(self, task: Task):
+    def add(self, task: Task) -> Tuple[Task, str]:
         salt = 0
-        while (hash := self._hash(str(task), salt)) in self.tasks.keys():
+        while (hash := self._hash(str(task), bytes(salt))) in self.tasks.keys():
             salt += 1
         self.tasks[hash] = task
         return task, hash
 
-    def pop(self, hash: str):
+    def pop(self, hash: str) -> Tuple[Task, str]:
         return self.tasks.pop(hash), hash
 
-    def filter(self, predicate):
+    def filter(self, predicate: Callable[[Task], bool]):
         tasks = {k: t for k, t in self.tasks.items() if predicate(t)}
         return TaskDB(tasks)
 
@@ -35,7 +36,7 @@ class TaskDB:
     def __getitem__(self, index) -> Task:
         return self.tasks[index]
 
-    def __iter__(self) -> Task:
+    def __iter__(self):
         due, rest, done = {}, {}, {}
         for h, t in self.tasks.items():
             if t.state == "done":
@@ -52,14 +53,12 @@ class TaskDB:
         ]
         yield from due + rest + done
 
-    def _hash(self, entry: str, salt: int) -> str:
-        salt = str(salt).encode()
+    def _hash(self, entry: str, salt: bytes) -> str:
         hash = int(
             hashlib.blake2b(entry.encode(), digest_size=2, salt=salt).hexdigest(),
             base=16,
         )
-        hash = hex(hash).lstrip("0x").zfill(4)
-        return hash
+        return hex(hash).lstrip("0x").zfill(4)
 
     def __repr__(self):
         all_tasks = "\n".join([f"{h}: {t}" for h, t in self.tasks.items()])
@@ -67,21 +66,39 @@ class TaskDB:
 
 
 class YamlDB:
+    """
+    Creates a TaskDB instance based on a yaml file.
+
+    Serves as a context manager, which returns a TaskDB instance. If opened in
+    write mode, the context manager will convert and write the returned TaskDB
+    instance to the original yaml file.
+    """
+
     def __init__(self, filename: str, mode: str = "r"):
+        """
+        Filename should point to valid yaml file. Mode can either be "r" or "w".
+        """
         assert mode in "rw"
         self.filename = filename
         self.mode = mode
 
     def backup(self, content):
+        """
+        Create a backup of the yaml file in XDG data share.
+        """
         backup_name = (
-            Path.home()
-            / ".local/share/kobold"
+            xdg.XDG_DATA_HOME
+            / "kobold"
             / f"kobold_backup_{arrow.now().format('YYYY-MM-DDTHH-mm-ss')}"
         )
         with open(backup_name, "w") as f:
             f.write(content)
 
     def __enter__(self) -> TaskDB:
+        """
+        Returns TaskDB from yaml file. Creates a backup if in write mode and
+        before content is changed.
+        """
         with open(self.filename, "r") as f:
             tasks = yaml.load(f, Loader=yaml.Loader)
             f.seek(0)
@@ -92,6 +109,9 @@ class YamlDB:
         return self.taskdb
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Writes the contained TaskDB to the yaml file if in write mode.
+        """
         if exc_type is None and self.mode == "w":
             with open(self.filename, "w") as f:
                 as_yaml = yaml.dump(
