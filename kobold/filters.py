@@ -34,5 +34,9 @@ def due_this_week(t: Task) -> bool:
     return now == task
 
 
+def overdue(t: Task) -> bool:
+    return arrow.now().isocalendar() > arrow.get(t.due).isocalendar()
+
+
 def todo(t: Task) -> bool:
     return not t.state == "done"

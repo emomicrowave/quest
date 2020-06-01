@@ -14,8 +14,9 @@ style_default = "white"
 style_hash = {"todo": "green", "in_progress": "yellow", "done": "bright_black"}
 style_project = "blue"
 style_done = "bright_black"
-style_future = "yellow"
-style_past = "magenta"
+style_due = "yellow"
+style_overdue = "bright_red bold"
+style_completed = "magenta"
 style_xp = "yellow"
 style_bar = {"bg": "bright_black", "complete": "yellow", "finished": "green"}
 
@@ -23,28 +24,28 @@ style_bar = {"bg": "bright_black", "complete": "yellow", "finished": "green"}
 def task_date(t: Task) -> Text:
     if t.state == "done":
         date = arrow.get(t.completed)
-        style = style_past
+        style = style_completed
     elif t.due:
         date = arrow.get(t.due)
-        style = style_future
+        style = style_due if date >= arrow.now().ceil("day") else style_overdue
     else:
         return Text("")
     now = arrow.now()
     if date.hour == 0 and date.minute == 0:
         date = date.ceil("day")
-        now = date.ceil("day")
-    if date.isocalendar()[1] == now.isocalendar()[1]:
-        date = date.humanize(granularity=["day"]) + " (" + date.format("ddd") + ")"
+        now = now.ceil("day")
+
+    if date.isocalendar() == now.isocalendar():
+        readable = "today"
+    elif now.shift(days=1).isocalendar() == date.isocalendar():
+        readable = "tomorrow"
+    elif now.shift(days=-1).isocalendar() == date.isocalendar():
+        readable = "yesterday"
+    elif date.isocalendar()[:2] == now.isocalendar()[:2]:
+        readable = date.humanize(granularity=["day"]) + " (" + date.format("ddd") + ")"
     else:
-        date = date.humanize(granularity=["day"])
-    # prettier
-    if "in a day" in date:
-        date = "tomorrow"
-    elif "a day ago" in date:
-        date = "yesterday"
-    elif "0 days" in date:
-        date = "today"
-    date = Text(f"{date}", style=style)
+        readable = date.humanize(granularity=["day"])
+    date = Text(f"{readable}", style=style)
     return date
 
 
@@ -91,7 +92,7 @@ def reward(task: Task):
 
 
 def agenda(tdb: TaskDB):
-    predicate = lambda t: filters.todo(t) and filters.due_this_week(t)
+    predicate = lambda t: filters.todo(t) and (filters.due_this_week(t) or filters.overdue(t))
     print(format_tdb(tdb.filter(predicate)))
 
 
