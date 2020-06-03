@@ -56,9 +56,14 @@ def due_today(t: Task) -> bool:
     """
     Task due date is today.
     """
-    now = arrow.now().isocalendar()
+    return due_on(t, arrow.now())
+
+
+@due_guard
+def due_on(t: Task, date: arrow.Arrow) -> bool:
     task = arrow.get(t.due).isocalendar()
-    return now == task
+    date = date.isocalendar()
+    return task == date
 
 
 @due_guard

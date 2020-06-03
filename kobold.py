@@ -25,6 +25,12 @@ def trello_cards():
     output.taskdb(tdb)
 
 
+@debug_app.command("cal", help="Display a calendar of this month.")
+def debug_print_calendar(period: str = Option("month")):
+    with YamlDB(config.path, "r") as tdb:
+        output.calendar(tdb, period)
+
+
 @debug_app.command("xp", help="List all rewarded XP.")
 def debug_app_print_xp():
     with YamlDB(config.path, "r") as tdb:
