@@ -84,7 +84,7 @@ def list_tasks(
     hide_done: bool = Option(True), project: str = Option(None, "--project", "-p")
 ):
     with YamlDB(config.path, "r") as tdb:
-        output.taskdb(tdb, project)
+        output.taskdb(tdb, project=project, hide_done=hide_done)
 
 
 @kobold.command("new", help="Create a new task.")
@@ -92,7 +92,7 @@ def add_task(
     entry: str,
     project: str = Option("void", "--project", "-p"),
     context: str = Option(None, "--context", "-c"),
-    xp: float = Option(1, "--xp", "-x"),
+    xp: int = Option(1, "--xp", "-x"),
     due: str = Option(None, "--due", "-d"),
 ):
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
