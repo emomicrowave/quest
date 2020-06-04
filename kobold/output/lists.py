@@ -76,8 +76,9 @@ def format_tdb(tdb: TaskDB, with_hash = True, with_date = True) -> Text:
     return Text("\n").join([format_task(t, h, with_hash, with_date) for h, t in tdb])
 
 
-def taskdb(tdb: TaskDB, project: str = None):
-    tdb = tdb.filter(filters.todo)
+def taskdb(tdb: TaskDB, project: str = None, hide_done = True):
+    if hide_done:
+        tdb = tdb.filter(filters.todo)
     if project:
         tdb = tdb.filter(lambda t: t.project == project)
     print(format_tdb(tdb))
