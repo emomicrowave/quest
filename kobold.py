@@ -4,7 +4,7 @@ from kobold import output, Task, YamlDB, load_user_configuration
 import kobold.trello as trello
 
 
-kobold = Typer(help="A commandline dwelling kobold taskmaster.", add_completion=False)
+kobold = Typer(help="A commandline dwelling kobold taskmaster.")
 trello_app = Typer()
 debug_app = Typer()
 
