@@ -1,6 +1,5 @@
 test:
-	coverage run -m pytest
-	coverage html
+	pytest --cov=kobold --cov-report html
 
 black:
 	black **.py
