@@ -1,4 +1,5 @@
 #!/home/hgf/.miniconda/envs/ork/bin/python
+import arrow
 from typer import Typer, Option, Argument, Context
 from kobold import output, Task, YamlDB, load_user_configuration
 import kobold.trello as trello
@@ -95,6 +96,10 @@ def add_task(
     xp: int = Option(1, "--xp", "-x"),
     due: str = Option(None, "--due", "-d"),
 ):
+    if due == "today":
+        due = arrow.now().format("YYYY-MM-DD")
+    elif due == "tomorrow":
+        due = arrow.now().shift(days=1).format("YYYY-MM-DD")
     task = Task(name=entry, project=project, context=context, xp=xp, due=due)
     with YamlDB(config.path, "w") as tdb:
         t, h = tdb.add(task)
