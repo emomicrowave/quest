@@ -1,5 +1,4 @@
 import arrow
-from parse import findall
 from typing import Dict
 
 
