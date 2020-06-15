@@ -135,5 +135,5 @@ def callback(ctx: Context):
         summary()
 
 
-if __name__ == "__main__":
+def run():
     quest()

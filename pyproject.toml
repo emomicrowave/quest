@@ -1,22 +1,23 @@
 [project]
 name = "quest"
+
+[tool.poetry]
+name = "quest"
+version = "2020.6.0"
 description = "Yet another CLI todo manager."
-authors = [
-    "Hristo Filaretov <h.filaretov@campus.tu-berlin.de>"
-]
+authors = ["Hristo Filaretov <h.filaretov@campus.tu-berlin.de>"]
 license = "MIT"
 readme = "readme.md"
+
+[tool.poetry.dependencies]
 python = "^3.8"
+arrow = "^0.15"
+PyYaml = "^5.3.1."
+rich = "^2.2.3"
+typer = "^0.2.1"
 
-[build-system]
-requires = ["flit_core >=2,<4"]
-build-backend = "flit_core.buildapi"
-
-[tool.flit.metadata]
-module = "quest"
-author = "Hristo Filaretov"
-author-email = "h.filaretov@campus.tu-berlin.de"
-classifiers = ["License :: OSI Approved :: MIT License"]
+[tool.poetry.scripts]
+quest = 'quest.cli:run'
 
 [tool.black]
 line-length = 90
