@@ -68,7 +68,7 @@ def format_task(t: Task, h: str, with_hash = True, with_date = True) -> Text:
             name,
             date if with_date else "",
             ]
-    task = Text(" ").join([p for p in parts if len(p) > 0])
+    task = Text(" ", end="").join([p for p in parts if len(p) > 0])
     return task
 
 
@@ -99,8 +99,8 @@ def all_xp(tdb: TaskDB):
 
 
 def reward(task: Task):
-    reward = Text(f"{task.xp}", style=style_xp)
-    print(format_task(task, ""), reward, em)
+    reward = Text(f" {task.xp} xp", style=style_xp)
+    print(format_task(task, ""), reward)
 
 
 def agenda(tdb: TaskDB):
