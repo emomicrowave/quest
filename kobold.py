@@ -14,6 +14,18 @@ kobold.add_typer(trello_app, name="trello", help="Trello functionality.")
 
 config = load_user_configuration()
 
+def parse_date(date: str) -> str:
+    """
+    Accepts either a YYYY-MM-DD[THH-mm] date or 'today' and 'tomorrow'.
+
+    The latter are converted to the former format.
+    """
+    if date == "today":
+        date = arrow.now().format("YYYY-MM-DD")
+    elif date == "tomorrow":
+        date = arrow.now().shift(days=1).format("YYYY-MM-DD")
+    return date
+
 
 @trello_app.command("boards", help="List Trello boards.")
 def trello_boards():
@@ -42,10 +54,9 @@ def debug_app_print_xp():
 def debug_edit(
     hash: str,
     project: str = Option(None, "--project", "-p"),
-    context: str = Option(None, "--context", "-c"),
     xp: int = Option(None, "--xp", "-x"),
-    due: str = Option(None, "--due", "-d"),
     state: str = Option(None, "--state", "-s"),
+    due: str = Option(None, "--due", "-d", callback=parse_date),
     completed: str = Option(None, "--completed"),
 ):
     with YamlDB(config.path, "w") as tdb:
@@ -53,10 +64,9 @@ def debug_edit(
         t.xp = xp or t.xp
         t.due = due or t.due
         t.project = project or t.project
-        t.context = context or t.context
         t.state = state or t.state
         t.completed = completed or t.completed
-        output.task(t, hash)
+    output.task(t, hash)
 
 
 @kobold.command("summary", help="Print daily summary.")
@@ -92,15 +102,10 @@ def list_tasks(
 def add_task(
     entry: str,
     project: str = Option("void", "--project", "-p"),
-    context: str = Option(None, "--context", "-c"),
     xp: int = Option(1, "--xp", "-x"),
-    due: str = Option(None, "--due", "-d"),
+    due: str = Option(None, "--due", "-d", callback=parse_date),
 ):
-    if due == "today":
-        due = arrow.now().format("YYYY-MM-DD")
-    elif due == "tomorrow":
-        due = arrow.now().shift(days=1).format("YYYY-MM-DD")
-    task = Task(name=entry, project=project, context=context, xp=xp, due=due)
+    task = Task(name=entry, project=project, xp=xp, due=due)
     with YamlDB(config.path, "w") as tdb:
         t, h = tdb.add(task)
         output.task(t, h)
@@ -110,7 +115,7 @@ def add_task(
 def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
     with YamlDB(config.path, "r") as tdb:
         task = tdb[hash]
-    entry = f"🥕 {task.project}: {task.name} {comment}".strip()
+    entry = f"{task.project}: {task.name} {comment}".strip()
     with open(config.taskfile, "w") as f:
         f.write(entry)
 
