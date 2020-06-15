@@ -99,7 +99,6 @@ def all_xp(tdb: TaskDB):
 
 
 def reward(task: Task):
-    em = ":shooting_star:"
     reward = Text(f"{task.xp}", style=style_xp)
     print(format_task(task, ""), reward, em)
 
@@ -123,7 +122,7 @@ def daily_xp(tdb: TaskDB):
         complete_style=style_bar.get("complete", style_default),
         finished_style=style_bar.get("finished", style_default),
     )
-    progress = Text(f" {xp}/{total}", style=style_xp)
+    progress = Text(f" {xp}/{total}", style=style_bar.get("complete") if xp < total else style_bar.get("finished"))
     print(bar, progress)
 
 
