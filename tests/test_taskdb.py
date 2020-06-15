@@ -1,7 +1,6 @@
 from yaml import load, Loader
 from pathlib import Path
-from context import kobold
-from kobold import Task, TaskDB
+from quest import Task, TaskDB
 
 
 def test_open_empty_taskdb():

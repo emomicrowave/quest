@@ -1,7 +1,7 @@
 [project]
-name = "kobold"
+name = "quest"
 version = "0.1.0"
-description = "Yet another CLI todo and project manager."
+description = "Yet another CLI todo manager."
 authors = [
     "Hristo Filaretov <h.filaretov@campus.tu-berlin.de>"
 ]
@@ -14,7 +14,7 @@ requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]
-module = "kobold"
+module = "quest"
 author = "Hristo Filaretov"
 author-email = "h.filaretov@campus.tu-berlin.de"
 classifiers = ["License :: OSI Approved :: MIT License"]

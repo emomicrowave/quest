@@ -79,8 +79,8 @@ class YamlDB:
         """
         backup_name = (
             xdg.XDG_DATA_HOME
-            / "kobold"
-            / f"kobold_backup_{arrow.now().format('YYYY-MM-DDTHH-mm-ss')}"
+            / "quest"
+            / f"quest_backup_{arrow.now().format('YYYY-MM-DDTHH-mm-ss')}"
         )
         with open(backup_name, "w") as f:
             f.write(content)

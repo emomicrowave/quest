@@ -1,5 +1,5 @@
 test:
-	pytest --cov=kobold --cov-report html
+	pytest --cov=quest --cov-report html
 
 black:
 	black **.py

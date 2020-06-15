@@ -1,8 +1,7 @@
 import pytest
 from dataclasses import dataclass
 
-from context import kobold
-from kobold import Task
+from quest import Task
 
 
 def test_create_empty_task():
