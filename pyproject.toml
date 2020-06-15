@@ -1,6 +1,5 @@
 [project]
 name = "quest"
-version = "0.1"
 description = "Yet another CLI todo manager."
 authors = [
     "Hristo Filaretov <h.filaretov@campus.tu-berlin.de>"
