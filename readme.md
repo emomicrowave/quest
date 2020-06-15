@@ -18,5 +18,5 @@ $ quest ls
 29a0 bass: learn a new song in 29 days
 
 $ quest done 29a0
-bass: learn a new song today 1.0 🌠
+bass: learn a new song today 1.0 1 xp
 ```
