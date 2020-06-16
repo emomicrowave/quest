@@ -1,4 +1,3 @@
-#!/home/hgf/.miniconda/envs/ork/bin/python
 import arrow
 from typer import Typer, Option, Argument, Context
 from quest import output, Task, YamlDB, load_user_configuration
