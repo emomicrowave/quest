@@ -3,3 +3,6 @@ test:
 
 black:
 	black **.py
+
+install:
+	pipx install --force .

@@ -16,7 +16,7 @@ config = load_user_configuration()
 
 def parse_date(date: str) -> str:
     """
-    Accepts either a YYYY-MM-DD[THH-mm] date or 'today' and 'tomorrow'.
+    Accepts either a YYYY-MM-DD[THH-mm] date or one of: ['today', 'tomorrow', 'eow', 'eom'].
 
     The latter are converted to the former format.
     """
@@ -24,6 +24,10 @@ def parse_date(date: str) -> str:
         date = arrow.now().format("YYYY-MM-DD")
     elif date == "tomorrow":
         date = arrow.now().shift(days=1).format("YYYY-MM-DD")
+    elif date == "eow":
+        date = arrow.now().ceil("week").format("YYYY-MM-DD")
+    elif date == "eom":
+        date = arrow.now().ceil("month").format("YYYY-MM-DD")
     return date
 
 
