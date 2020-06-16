@@ -15,11 +15,11 @@ config = load_user_configuration()
 
 def parse_date(date: str) -> str:
     """
-    Accepts either a YYYY-MM-DD[THH-mm] date or one of: ['today', 'tomorrow', 'eow', 'eom'].
+    Accepts either a YYYY-MM-DD[THH-mm] date or one of: ['today', '.', 'tomorrow', 'eow', 'eom'].
 
     The latter are converted to the former format.
     """
-    if date == "today":
+    if date in ["today", "."]:
         date = arrow.now().format("YYYY-MM-DD")
     elif date == "tomorrow":
         date = arrow.now().shift(days=1).format("YYYY-MM-DD")
