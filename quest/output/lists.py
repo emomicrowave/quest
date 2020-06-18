@@ -12,7 +12,7 @@ from itertools import zip_longest
 
 style_default = "white"
 style_hash = {"todo": "green", "in_progress": "yellow", "done": "bright_black"}
-style_project = "blue"
+style_project = {"done": "bright_black", "default": "blue"}
 style_done = "bright_black"
 style_early_bird = "green"
 style_due = "yellow"
@@ -36,6 +36,7 @@ def task_date(t: Task) -> Text:
             style = style_due
     else:
         return Text("")
+
     now = arrow.now()
     if date.hour == 0 and date.minute == 0:
         date = date.ceil("day")
@@ -59,7 +60,7 @@ def format_task(t: Task, h: str, with_hash = True, with_date = True) -> Text:
     if not isinstance(t, Task):
         return Text("")
     hash = Text(h, style=style_hash.get(t.state, style_default))
-    project = Text(f"{t.project}:", style=style_project)
+    project = Text(f"{t.project}:", style=style_project.get(t.state, style_project["default"]))
     name = Text(t.name)
     date = task_date(t)
     parts = [
@@ -85,7 +86,7 @@ def taskdb(tdb: TaskDB, project: str = None, hide_done = True):
 
 
 def task(task: Task, hash: str):
-    print(format_task(task, hash))
+    print(format_task(task, hash), '\n')
 
 
 def summary(tdb: TaskDB):
