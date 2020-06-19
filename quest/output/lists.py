@@ -1,6 +1,7 @@
 from ..taskdb import TaskDB
 from ..task import Task
 from .. import filters
+from ..date_utils import humanize
 
 import arrow
 from rich import print, box
@@ -24,10 +25,10 @@ style_bar = {"bg": "bright_black", "complete": "yellow", "finished": "green"}
 
 def task_date(t: Task) -> Text:
     if t.state == "done":
-        date = arrow.get(t.completed)
+        date = humanize(t.completed)
         style = style_completed
     elif t.due:
-        date = arrow.get(t.due)
+        date = humanize(t.due)
         if filters.overdue(t):
             style = style_overdue
         elif filters.due_remaining(t, 2):
@@ -35,41 +36,25 @@ def task_date(t: Task) -> Text:
         else:
             style = style_due
     else:
-        return Text("")
+        date = ""
+        style = ""
 
-    now = arrow.now()
-    if date.hour == 0 and date.minute == 0:
-        date = date.ceil("day")
-        now = now.ceil("day")
-
-    if date.isocalendar() == now.isocalendar():
-        readable = "today"
-    elif now.shift(days=1).isocalendar() == date.isocalendar():
-        readable = "tomorrow"
-    elif now.shift(days=-1).isocalendar() == date.isocalendar():
-        readable = "yesterday"
-    elif date.isocalendar()[:2] == now.isocalendar()[:2]:
-        readable = date.humanize(granularity=["day"]) + " (" + date.format("ddd") + ")"
-    else:
-        readable = date.humanize(granularity=["day"])
-    date = Text(f"{readable}", style=style)
-    return date
+    return Text(date, style=style)
 
 
 def format_task(t: Task, h: str, with_hash = True, with_date = True) -> Text:
-    if not isinstance(t, Task):
-        return Text("")
     hash = Text(h, style=style_hash.get(t.state, style_default))
     project = Text(f"{t.project}:", style=style_project.get(t.state, style_project["default"]))
     name = Text(t.name)
     date = task_date(t)
+
     parts = [
-            hash if with_hash else "",
-            project,
+            hash if with_hash else None,
+            project if t.project else None,
             name,
-            date if with_date else "",
+            date if with_date else None,
             ]
-    task = Text(" ", end="").join([p for p in parts if len(p) > 0])
+    task = Text(" ", end="").join([p for p in parts if p is not None])
     return task
 
 
@@ -144,7 +129,7 @@ def kanban(tdb: TaskDB, week=False, today=False):
         f"done [yellow]{done.xp}",
         box=box.ROUNDED,
     )
-    zipped = zip_longest(todo, in_progress, done, fillvalue="__")
+    zipped = zip_longest(todo, in_progress, done, fillvalue=("", Task()))
     for tasks in zipped:
         formatted = [format_task(t, h) for h, t in tasks]
         table.add_row(*formatted)

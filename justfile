@@ -6,3 +6,6 @@ black:
 
 install:
 	pipx install --force .
+
+dev:
+	poetry shell

@@ -1,6 +1,8 @@
 import arrow
 from typer import Typer, Option, Argument, Context
-from quest import output, Task, YamlDB, load_user_configuration
+from . import output, Task, YamlDB, load_user_configuration
+from .date_utils import parse_date
+
 import quest.trello as trello
 
 
@@ -12,22 +14,6 @@ quest.add_typer(debug_app, name="debug", help="Debug commands.")
 quest.add_typer(trello_app, name="trello", help="Trello functionality.")
 
 config = load_user_configuration()
-
-def parse_date(date: str) -> str:
-    """
-    Accepts either a YYYY-MM-DD[THH-mm] date or one of: ['today', '.', 'tomorrow', 'eow', 'eom'].
-
-    The latter are converted to the former format.
-    """
-    if date in ["today", "."]:
-        date = arrow.now().format("YYYY-MM-DD")
-    elif date == "tomorrow":
-        date = arrow.now().shift(days=1).format("YYYY-MM-DD")
-    elif date == "eow":
-        date = arrow.now().ceil("week").format("YYYY-MM-DD")
-    elif date == "eom":
-        date = arrow.now().ceil("month").format("YYYY-MM-DD")
-    return date
 
 
 @trello_app.command("boards", help="List Trello boards.")

@@ -4,11 +4,6 @@ from dataclasses import dataclass
 from quest import Task
 
 
-def test_create_empty_task():
-    with pytest.raises(ValueError):
-        t = Task("")
-
-
 def test_not_done():
     t = Task(name="test", project="test", state="todo", created="now", due="tomorrow")
     assert not t.done
