@@ -17,17 +17,19 @@ def parse_date(date: str) -> str:
 
     The latter are converted to the former format so that they can be parsed as an Arrow object.
     """
-    if date in ["today", "."]:
-        date = arrow.now().format("YYYY-MM-DD")
-    elif date == "tomorrow":
-        date = arrow.now().shift(days=1).format("YYYY-MM-DD")
-    elif date == "eow":
-        date = arrow.now().ceil("week").format("YYYY-MM-DD")
-    elif date == "eom":
-        date = arrow.now().ceil("month").format("YYYY-MM-DD")
-    elif date.lower() in weekdays:
-        date = arrow.now().shift(weekday=weekdays[date]).format("YYYY-MM-DD")
-    return date
+    try:
+        if date in ["today", "."]:
+            date = arrow.now().format("YYYY-MM-DD")
+        elif date == "tomorrow":
+            date = arrow.now().shift(days=1).format("YYYY-MM-DD")
+        elif date == "eow":
+            date = arrow.now().ceil("week").format("YYYY-MM-DD")
+        elif date == "eom":
+            date = arrow.now().ceil("month").format("YYYY-MM-DD")
+        elif date.lower() in weekdays:
+            date = arrow.now().shift(weekday=weekdays[date]).format("YYYY-MM-DD")
+    finally:
+        return date
 
 
 def humanize(date: str) -> str:
