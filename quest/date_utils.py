@@ -1,9 +1,19 @@
 import arrow
 
+weekdays = {
+    "mon": 0,
+    "tue": 1,
+    "wed": 2,
+    "thu": 3,
+    "fri": 4,
+    "sat": 5,
+    "sun": 6,
+}
+
 
 def parse_date(date: str) -> str:
     """
-    Accepts either a YYYY-MM-DD[THH-mm] date or one of: ['today', '.', 'tomorrow', 'eow', 'eom'].
+    Accepts either a YYYY-MM-DD[THH-mm] date, a weekday or one of: ['today', '.', 'tomorrow', 'eow', 'eom'].
 
     The latter are converted to the former format so that they can be parsed as an Arrow object.
     """
@@ -15,7 +25,10 @@ def parse_date(date: str) -> str:
         date = arrow.now().ceil("week").format("YYYY-MM-DD")
     elif date == "eom":
         date = arrow.now().ceil("month").format("YYYY-MM-DD")
+    elif date.lower() in weekdays:
+        date = arrow.now().shift(weekday=weekdays[date]).format("YYYY-MM-DD")
     return date
+
 
 def humanize(date: str) -> str:
     """
@@ -46,5 +59,5 @@ def humanize(date: str) -> str:
     elif 0 <= diff <= 7:
         readable = f"{date.humanize(granularity=['day'])} ({date.format('ddd')})"
     else:
-        readable = date.humanize(granularity=['day'])
+        readable = date.humanize(granularity=["day"])
     return readable
