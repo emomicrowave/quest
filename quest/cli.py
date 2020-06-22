@@ -93,6 +93,7 @@ def add_task(
     project: str = Option("void", "--project", "-p"),
     xp: int = Option(1, "--xp", "-x"),
     due: str = Option(None, "--due", "-d", callback=parse_date),
+    state: str = Option("todo", "--state", "-s", callback=parse_date),
 ):
     task = Task(name=entry, project=project, xp=xp, due=due)
     with YamlDB(config.path, "w") as tdb:
