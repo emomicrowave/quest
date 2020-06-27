@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quest"
-version = "2020.6.9"
+version = "2020.6.10"
 description = "A commandline quest log."
 authors = ["Hristo Filaretov <h.filaretov@campus.tu-berlin.de>"]
 license = "MIT"

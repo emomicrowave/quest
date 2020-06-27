@@ -71,10 +71,10 @@ class YamlDB:
         assert mode in "rw"
         self.filename = filename
         self.mode = mode
-        self.create_if_nonexistant()
+        self.create_if_nonexistant(filename)
 
-    def create_if_nonexistant(self):
-        p = Path(self.filename)
+    def create_if_nonexistant(self, filename):
+        p = Path(filename)
         p.parent.mkdir(parents=True, exist_ok=True)
         p.touch(exist_ok=True)
 
@@ -87,6 +87,7 @@ class YamlDB:
             / "quest"
             / f"quest_backup_{arrow.now().format('YYYY-MM-DDTHH-mm-ss')}"
         )
+        self.create_if_nonexistant(backup_name)
         with open(backup_name, "w") as f:
             f.write(content)
 
