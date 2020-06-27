@@ -42,27 +42,29 @@ def task_date(t: Task) -> Text:
     return Text(date, style=style)
 
 
-def format_task(t: Task, h: str, with_hash = True, with_date = True) -> Text:
+def format_task(t: Task, h: str, with_hash=True, with_date=True) -> Text:
     hash = Text(h, style=style_hash.get(t.state, style_default))
-    project = Text(f"{t.project}:", style=style_project.get(t.state, style_project["default"]))
+    project = Text(
+        f"{t.project}:", style=style_project.get(t.state, style_project["default"])
+    )
     name = Text(t.name)
     date = task_date(t)
 
     parts = [
-            hash if with_hash else None,
-            project if t.project else None,
-            name,
-            date if with_date else None,
-            ]
+        hash if with_hash else None,
+        project if t.project else None,
+        name,
+        date if with_date else None,
+    ]
     task = Text(" ", end="").join([p for p in parts if p is not None])
     return task
 
 
-def format_tdb(tdb: TaskDB, with_hash = True, with_date = True) -> Text:
+def format_tdb(tdb: TaskDB, with_hash=True, with_date=True) -> Text:
     return Text("\n").join([format_task(t, h, with_hash, with_date) for h, t in tdb])
 
 
-def taskdb(tdb: TaskDB, project: str = None, hide_done = True):
+def taskdb(tdb: TaskDB, project: str = None, hide_done=True):
     if hide_done:
         tdb = tdb.filter(filters.todo)
     if project:
@@ -71,7 +73,7 @@ def taskdb(tdb: TaskDB, project: str = None, hide_done = True):
 
 
 def task(task: Task, hash: str):
-    print(format_task(task, hash), '\n')
+    print(format_task(task, hash), "\n")
 
 
 def summary(tdb: TaskDB):
@@ -108,7 +110,10 @@ def daily_xp(tdb: TaskDB):
         complete_style=style_bar.get("complete", style_default),
         finished_style=style_bar.get("finished", style_default),
     )
-    progress = Text(f" {xp}/{total}", style=style_bar.get("complete") if xp < total else style_bar.get("finished"))
+    progress = Text(
+        f" {xp}/{total}",
+        style=style_bar.get("complete") if xp < total else style_bar.get("finished"),
+    )
     print(bar, progress)
 
 
@@ -134,4 +139,3 @@ def kanban(tdb: TaskDB, week=False, today=False):
         formatted = [format_task(t, h) for h, t in tasks]
         table.add_row(*formatted)
     print(table)
-

@@ -39,8 +39,12 @@ class TaskDB:
         return self.tasks[index]
 
     def __iter__(self):
-        t = lambda s, m: arrow.get(s).timestamp + (10**10*m) if s else 0
-        keyer = lambda x: -t(x[1].completed, -2) if x[1].state == "done" else t(x[1].due, 0) or t(x[1].created, 1)
+        t = lambda s, m: arrow.get(s).timestamp + (10 ** 10 * m) if s else 0
+        keyer = (
+            lambda x: -t(x[1].completed, -2)
+            if x[1].state == "done"
+            else t(x[1].due, 0) or t(x[1].created, 1)
+        )
         yield from ((h, t) for h, t in sorted(self.tasks.items(), key=keyer))
 
     def _hash(self, entry: str, salt: bytes) -> str:
