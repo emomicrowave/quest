@@ -4,6 +4,7 @@ from . import output, Task, YamlDB, load_user_configuration
 from .date_utils import parse_date
 
 import quest.trello as trello
+from importlib.metadata import version
 
 
 quest = Typer(help="A commandline quest log.")
@@ -99,6 +100,11 @@ def add_task(
     with YamlDB(config.path, "w") as tdb:
         t, h = tdb.add(task)
         output.task(t, h)
+
+
+@quest.command("version", help="Get version number")
+def get_version():
+    print(version("quest"))
 
 
 @quest.command("track", help="Write task to tracking file.")

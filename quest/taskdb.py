@@ -71,6 +71,13 @@ class YamlDB:
         assert mode in "rw"
         self.filename = filename
         self.mode = mode
+        self.create_if_nonexistant()
+
+    def create_if_nonexistant(self):
+        if not Path(self.filename).exists():
+            p = Path(self.filename)
+            p.parent.mkdir(parents=True)
+            p.touch()
 
     def backup(self, content):
         """
