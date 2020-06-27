@@ -1,5 +1,8 @@
-
 # Quest
+
+## Contents
+
+* [Quick-start guide](quickstart.md)
 
 ## Quick-start guide
 
@@ -34,4 +37,5 @@ $ quest ls --no-hide-done
 1fbb lich: defeat evil Lich in 2 days (Sun)
 65f3 lich: travel to Lich's lair today
 ```
+
 
