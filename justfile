@@ -1,11 +1,11 @@
 test:
-	pytest --cov=quest --cov-report html
+	poetry run pytest --cov=quest --cov-report html
 
 black:
-	black **.py
+	poetry run black **.py
 
 install:
-	pipx install --force .
+	poetry install
 
 dev:
 	poetry shell

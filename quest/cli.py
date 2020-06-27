@@ -102,7 +102,7 @@ def add_task(
         output.task(t, h)
 
 
-@quest.command("version", help="Get version number")
+@quest.command("version", help="Print version number.")
 def get_version():
     print(version("quest"))
 
