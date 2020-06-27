@@ -74,10 +74,9 @@ class YamlDB:
         self.create_if_nonexistant()
 
     def create_if_nonexistant(self):
-        if not Path(self.filename).exists():
-            p = Path(self.filename)
-            p.parent.mkdir(parents=True)
-            p.touch()
+        p = Path(self.filename)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.touch(exist_ok=True)
 
     def backup(self, content):
         """

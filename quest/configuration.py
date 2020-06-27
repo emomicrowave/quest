@@ -19,6 +19,9 @@ class Config:
 
 def load_user_configuration() -> Config:
     config_path = xdg.XDG_CONFIG_HOME / "quest.yaml"
-    with open(config_path, "r") as f:
-        config = yaml.load(f, Loader=yaml.Loader)
-    return Config(**config)
+    if config_path.exists():
+        with open(config_path, "r") as f:
+            config = yaml.load(f, Loader=yaml.Loader)
+            return Config(**config)
+    else:
+        return Config()
