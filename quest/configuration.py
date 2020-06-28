@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 @dataclass
-class Config:
+class Configuration:
     path: str = field(default=xdg.XDG_DATA_HOME / "quest/tasks.yaml")
     trello: Dict = field(default_factory=dict)
     taskfile: Path = field(default=xdg.XDG_DATA_HOME / "quest/taskfile")
@@ -17,11 +17,11 @@ class Config:
             self.taskfile = Path(self.taskfile).expanduser()
 
 
-def load_user_configuration() -> Config:
+def load_user_configuration() -> Configuration:
     config_path = xdg.XDG_CONFIG_HOME / "quest.yaml"
     if config_path.exists():
         with open(config_path, "r") as f:
             config = yaml.load(f, Loader=yaml.Loader)
-            return Config(**config)
+            return Configuration(**config)
     else:
-        return Config()
+        return Configuration()
