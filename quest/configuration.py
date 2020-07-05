@@ -14,6 +14,11 @@ class Configuration:
     def __post_init__(self):
         self.path = Path(self.path).expanduser()
 
+    def __str__(self):
+        config = "Config path:    {}".format(Path(self.config).absolute())
+        path = "Main task file: {}".format(Path(self.path).absolute())
+        return "\n".join((config, path))
+
 
 def load_user_configuration() -> Configuration:
     config_path = xdg.XDG_CONFIG_HOME / "quest.yaml"

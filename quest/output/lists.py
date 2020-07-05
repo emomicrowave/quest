@@ -11,7 +11,6 @@ from rich.bar import Bar
 from rich.table import Table, Column
 from functools import singledispatch
 from itertools import zip_longest
-from pathlib import Path
 
 style_default = "white"
 style_hash = {"todo": "green", "in_progress": "yellow", "done": "bright_black"}
@@ -144,5 +143,4 @@ def kanban(tdb: TaskDB, week=False, today=False):
 
 
 def config_dump(config: Configuration):
-    print("Config path:    {}".format(Path(config.config).absolute()))
-    print("Main task file: {}".format(Path(config.path).absolute()))
+    print(config)
