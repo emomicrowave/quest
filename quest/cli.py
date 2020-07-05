@@ -42,7 +42,7 @@ def debug_app_print_xp():
 
 @debug_app.command("config", help="Show location of default quest files.")
 def debug_config_dump():
-    output.config_dump(config)
+    print(config)
 
 
 @quest.command("edit", help="Edit properties of existing tasks.")

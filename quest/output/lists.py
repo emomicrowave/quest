@@ -141,6 +141,3 @@ def kanban(tdb: TaskDB, week=False, today=False):
         table.add_row(*formatted)
     print(table)
 
-
-def config_dump(config: Configuration):
-    print(config)
