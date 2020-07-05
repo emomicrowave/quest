@@ -1,2 +1,2 @@
 from .calendar import calendar
-from .lists import taskdb, task, agenda, summary, kanban, all_xp, config_dump
+from .lists import taskdb, task, agenda, summary, kanban, all_xp, config_dump, reward
