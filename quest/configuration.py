@@ -9,12 +9,15 @@ from pathlib import Path
 class Configuration:
     path: str = field(default=xdg.XDG_DATA_HOME / "quest/tasks.yaml")
     trello: Dict = field(default_factory=dict)
-    taskfile: Path = field(default=xdg.XDG_DATA_HOME / "quest/taskfile")
+    config: Path = field(default=xdg.XDG_CONFIG_HOME / "quest.yaml")
 
     def __post_init__(self):
         self.path = Path(self.path).expanduser()
-        if self.taskfile:
-            self.taskfile = Path(self.taskfile).expanduser()
+
+    def __str__(self):
+        config = "Config path:    {}".format(Path(self.config).absolute())
+        path = "Main task file: {}".format(Path(self.path).absolute())
+        return "\n".join((config, path))
 
 
 def load_user_configuration() -> Configuration:

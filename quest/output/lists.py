@@ -3,12 +3,10 @@ from ..task import Task
 from .. import filters
 from ..date_utils import humanize
 
-import arrow
 from rich import print, box
 from rich.text import Text
 from rich.bar import Bar
-from rich.table import Table, Column
-from functools import singledispatch
+from rich.table import Table
 from itertools import zip_longest
 
 style_default = "white"

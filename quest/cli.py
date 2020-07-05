@@ -40,6 +40,11 @@ def debug_app_print_xp():
         output.all_xp(tdb)
 
 
+@debug_app.command("config", help="Show location of default quest files.")
+def debug_config_dump():
+    print(config)
+
+
 @quest.command("edit", help="Edit properties of existing tasks.")
 def debug_edit(
     hash: str,
@@ -105,15 +110,6 @@ def add_task(
 @quest.command("version", help="Print version number.")
 def get_version():
     print(version("quest"))
-
-
-@quest.command("track", help="Write task to tracking file.")
-def track_task(hash: str, comment: str = Option("", "--comment", "-c")):
-    with YamlDB(config.path, "r") as tdb:
-        task = tdb[hash]
-    entry = f"{task.project}: {task.name} {comment}".strip()
-    with open(config.taskfile, "w") as f:
-        f.write(entry)
 
 
 @quest.command("kanban", help="Print tasks as kanban board.")
