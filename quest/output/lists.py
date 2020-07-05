@@ -140,4 +140,3 @@ def kanban(tdb: TaskDB, week=False, today=False):
         formatted = [format_task(t, h) for h, t in tasks]
         table.add_row(*formatted)
     print(table)
-
