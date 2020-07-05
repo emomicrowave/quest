@@ -146,4 +146,3 @@ def kanban(tdb: TaskDB, week=False, today=False):
 def config_dump(config: Configuration):
     print("Config path:    {}".format(Path(config.config).absolute()))
     print("Main task file: {}".format(Path(config.path).absolute()))
-    print("Tracked tasks:  {}".format(Path(config.taskfile).absolute()))
