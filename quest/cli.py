@@ -40,6 +40,11 @@ def debug_app_print_xp():
         output.all_xp(tdb)
 
 
+@debug_app.command("config", help="Show location of default quest files.")
+def debug_config_dump():
+    output.config_dump(config)
+
+
 @quest.command("edit", help="Edit properties of existing tasks.")
 def debug_edit(
     hash: str,

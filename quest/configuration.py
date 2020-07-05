@@ -10,6 +10,7 @@ class Configuration:
     path: str = field(default=xdg.XDG_DATA_HOME / "quest/tasks.yaml")
     trello: Dict = field(default_factory=dict)
     taskfile: Path = field(default=xdg.XDG_DATA_HOME / "quest/taskfile")
+    config: Path = field(default=xdg.XDG_CONFIG_HOME / "quest.yaml")
 
     def __post_init__(self):
         self.path = Path(self.path).expanduser()
